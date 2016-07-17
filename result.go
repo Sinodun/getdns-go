@@ -110,6 +110,16 @@ func (r *Result) RepliesTree() (List, error) {
     return convertList(list)
 }
 
+func (r *Result) ValidationChain() (List, error) {
+    var list *C.getdns_list
+
+    rc := C.getdns_dict_get_list(r.res, C.CString("validation_chain"), &list)
+    if rc != RETURN_GOOD {
+        return nil, &Error{int(rc)}
+    }
+    return convertList(list)
+}
+
 func (r *Result) Status() (uint32, error) {
     return r.getInt("status")
 }

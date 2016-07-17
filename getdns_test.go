@@ -111,4 +111,10 @@ func TestAddress(t *testing.T) {
     if can != "pigwidgeon.lunch.org.uk" {
         t.Errorf("Wrong canonical name: %s", can)
     }
+
+    _, err = res.ValidationChain()
+    if err == nil {
+        t.Error("ValidationChain found!")
+        return
+    }
 }
