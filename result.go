@@ -69,7 +69,7 @@ func (r *Result) JustAddressAnswers() ([]map[string]string, error) {
         return nil, &Error{int(rc)}
     }
 
-    l, err := convertList(list)
+    l, err := convertListToGo(list)
     if err != nil {
         return nil, err
     }
@@ -107,7 +107,7 @@ func (r *Result) RepliesTree() (List, error) {
     if rc != RETURN_GOOD {
         return nil, &Error{int(rc)}
     }
-    return convertList(list)
+    return convertListToGo(list)
 }
 
 func (r *Result) ValidationChain() (List, error) {
@@ -117,7 +117,7 @@ func (r *Result) ValidationChain() (List, error) {
     if rc != RETURN_GOOD {
         return nil, &Error{int(rc)}
     }
-    return convertList(list)
+    return convertListToGo(list)
 }
 
 func (r *Result) Status() (uint32, error) {

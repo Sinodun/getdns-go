@@ -24,7 +24,7 @@ func bindataToByteSlice(bindata *C.getdns_bindata) []byte {
 type List []interface{}
 type Dict map[string]interface{}
 
-func convertDict(dict *C.getdns_dict) (Dict, error) {
+func convertDictToGo(dict *C.getdns_dict) (Dict, error) {
     var keys *C.getdns_list
     var nKeys C.size_t
 
@@ -64,7 +64,7 @@ func convertDict(dict *C.getdns_dict) (Dict, error) {
             if rc != RETURN_GOOD {
                 return nil, &Error{int(rc)}
             }
-            li, err := convertList(listItem)
+            li, err := convertListToGo(listItem)
             if err != nil {
                 return nil, err
             }
@@ -75,7 +75,7 @@ func convertDict(dict *C.getdns_dict) (Dict, error) {
             if rc != RETURN_GOOD {
                 return nil, &Error{int(rc)}
             }
-            d, err := convertDict(dictItem)
+            d, err := convertDictToGo(dictItem)
             if err != nil {
                 return nil, err
             }
@@ -103,7 +103,7 @@ func convertDict(dict *C.getdns_dict) (Dict, error) {
     return res, nil
 }
 
-func convertList(list *C.getdns_list) (List, error) {
+func convertListToGo(list *C.getdns_list) (List, error) {
     var length C.size_t
     rc := C.getdns_list_get_length(list, &length)
     if rc != RETURN_GOOD {
@@ -129,7 +129,7 @@ func convertList(list *C.getdns_list) (List, error) {
             if rc != RETURN_GOOD {
                 return nil, &Error{int(rc)}
             }
-            li, err := convertList(listItem)
+            li, err := convertListToGo(listItem)
             if err != nil {
                 return nil, err
             }
@@ -140,7 +140,7 @@ func convertList(list *C.getdns_list) (List, error) {
             if rc != RETURN_GOOD {
                 return nil, &Error{int(rc)}
             }
-            d, err := convertDict(dictItem)
+            d, err := convertDictToGo(dictItem)
             if err != nil {
                 return nil, err
             }
