@@ -181,7 +181,12 @@ func (l *List) String() (res string) {
         case int:
             res = res + fmt.Sprintf("%d", val)
         case []byte:
-            res = res + string(val)
+            s, err := ConvertDNSNameToFQDN(val)
+            if err != nil {
+                res = res + string(val)
+            } else {
+                res = res + s
+            }
         case List:
             res = res + val.String()
         case Dict:
@@ -207,7 +212,12 @@ func (d *Dict) String() (res string) {
         case int:
             res = res + fmt.Sprintf("%d", val)
         case []byte:
-            res = res + string(val)
+            s, err := ConvertDNSNameToFQDN(val)
+            if err != nil {
+                res = res + string(val)
+            } else {
+                res = res + s
+            }
         case List:
             res = res + val.String()
         case Dict:
@@ -229,4 +239,32 @@ func (err *Error) Code() int {
 
 func (err *Error) Error() string {
     return C.GoString(C.getdns_get_errorstr_by_id(C.uint16_t(err.rc)))
+}
+
+func ConvertDNSNameToFQDN(b []byte) (string, error) {
+    first := true
+    res := ""
+    p := 0
+    if len(b) < 1 {
+        return "", &Error{RETURN_GENERIC_ERROR}
+    }
+    for {
+        labelLen := int(b[p])
+        p = p + 1
+        if labelLen == 0 {
+            break
+        }
+        if labelLen > 63 || p+labelLen >= len(b) {
+            return "", &Error{RETURN_GENERIC_ERROR}
+        }
+        labelContent := b[p : p+labelLen]
+        if first {
+            first = false
+            res = string(labelContent)
+        } else {
+            res = res + "." + string(labelContent)
+        }
+        p = p + int(labelLen)
+    }
+    return res, nil
 }
