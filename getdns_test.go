@@ -1,7 +1,6 @@
 package getdns_test
 
 import (
-    "fmt"
     "testing"
 
     "getdns"
@@ -10,7 +9,7 @@ import (
 func TestContextCreate(t *testing.T) {
     c, err := getdns.CreateContext(true)
     if c == nil {
-        t.Error(fmt.Sprintf("No Context created: %s", err))
+        t.Errorf("No Context created: %s", err)
         return
     }
 
@@ -29,38 +28,38 @@ func TestContextCreate(t *testing.T) {
 func TestAddress(t *testing.T) {
     c, err := getdns.CreateContext(true)
     if c == nil {
-        t.Error(fmt.Sprintf("No Context created: %s", err))
+        t.Errorf("No Context created: %s", err)
         return
     }
     defer c.Destroy()
 
     res, err := c.Address("www.lunch.org.uk")
     if res == nil {
-        t.Error(fmt.Sprintf("No Result created: %s", err))
+        t.Errorf("No Result created: %s", err)
         return
     }
     status, err := res.Status()
     if err != nil {
-        t.Error(fmt.Sprintf("No Status: %s", err))
+        t.Errorf("No Status: %s", err)
         return
     }
     if status != getdns.RESPSTATUS_GOOD {
-        t.Error(fmt.Sprintf("Bad Status: %d", status))
+        t.Errorf("Bad Status: %d", status)
         return
     }
     ansType, err := res.AnswerType()
     if err != nil {
-        t.Error(fmt.Sprintf("No AnswerType: %s", err))
+        t.Errorf("No AnswerType: %s", err)
         return
     }
     if ansType != getdns.NAMETYPE_DNS {
-        t.Error(fmt.Sprintf("Bad AnswerType: %d", ansType))
+        t.Errorf("Bad AnswerType: %d", ansType)
         return
     }
 
     addrAns, err := res.JustAddressAnswers()
     if err != nil {
-        t.Error(fmt.Sprintf("No JustAddressAnswers: %s", err))
+        t.Errorf("No JustAddressAnswers: %s", err)
         return
     }
 
@@ -79,7 +78,7 @@ func TestAddress(t *testing.T) {
 
     rt, err := res.RepliesTree()
     if err != nil {
-        t.Error(fmt.Sprintf("No RepliesTree: %s", err))
+        t.Errorf("No RepliesTree: %s", err)
         return
     }
 
