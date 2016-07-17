@@ -238,7 +238,7 @@ func (err *Error) Code() int {
 }
 
 func (err *Error) Error() string {
-    return C.GoString(C.getdns_get_errorstr_by_id(C.uint16_t(err.rc)))
+    return fmt.Sprintf("getdns error %d: %s", err.rc, C.GoString(C.getdns_get_errorstr_by_id(C.uint16_t(err.rc))))
 }
 
 func ConvertDNSNameToFQDN(b []byte) (string, error) {
