@@ -44,6 +44,23 @@ func (r *Result) AnswerType() (uint32, error) {
     return r.getInt("answer_type")
 }
 
+func (r *Result) CanonicalName() (string, error) {
+    var bindata *C.getdns_bindata
+
+    rc := C.getdns_dict_get_bindata(r.res, C.CString("canonical_name"), &bindata)
+    if rc != RETURN_GOOD {
+        return "", &Error{int(rc)}
+    }
+
+    b := bindataToByteSlice(bindata)
+    dname, err := ConvertDNSNameToFQDN(b)
+    if err != nil {
+        return string(b), err
+    } else {
+        return dname, nil
+    }
+}
+
 func (r *Result) JustAddressAnswers() ([]map[string]string, error) {
     var list *C.getdns_list
 

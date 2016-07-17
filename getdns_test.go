@@ -82,5 +82,33 @@ func TestAddress(t *testing.T) {
         return
     }
 
-    fmt.Print(rt.String())
+    d, ok := rt[0].(getdns.Dict)
+    if !ok {
+        t.Error("RepliesTree: no dict at [0]")
+        return
+    }
+    q, ok := d["question"].(getdns.Dict)
+    if !ok {
+        t.Error("RepliesTree: no question")
+        return
+    }
+    qname, ok := q["qname"].([]byte)
+    if !ok {
+        t.Error("RepliesTree: no qname")
+        return
+    }
+    fqdn, err := getdns.ConvertDNSNameToFQDN(qname)
+    if err != nil || fqdn != "www.lunch.org.uk" {
+        t.Errorf("QNAME incorrect: %s", qname)
+    }
+
+    can, err := res.CanonicalName()
+    if err != nil {
+        t.Errorf("No CanonicalName: %s", err)
+        return
+    }
+
+    if can != "pigwidgeon.lunch.org.uk" {
+        t.Errorf("Wrong canonical name: %s", can)
+    }
 }
