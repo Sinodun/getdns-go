@@ -86,9 +86,6 @@ func (r *Result) JustAddressAnswers() ([]map[string]string, error) {
             return nil, &Error{RETURN_GENERIC_ERROR}
         }
         item["address_type"] = string(addrType)
-        if !ok {
-            return nil, &Error{RETURN_GENERIC_ERROR}
-        }
         var ad net.IP
         ad, ok = d["address_data"].([]byte)
         if !ok {
