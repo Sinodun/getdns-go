@@ -6,6 +6,8 @@ import "C"
 
 import (
     "fmt"
+    "net"
+    "unicode"
     "unsafe"
 )
 
@@ -173,12 +175,24 @@ func val2str(item interface{}) string {
     case int:
         return fmt.Sprintf("%d", val)
     case []byte:
+        printable := true
+        for _, c := range string(val) {
+            if !unicode.IsPrint(c) {
+                printable = false
+            }
+        }
+        if printable {
+            return "'" + string(val) + "'"
+        }
         s, err := ConvertDNSNameToFQDN(val)
-        if err != nil {
-            return "<memory>"
-        } else {
+        if err == nil {
             return "'" + s + "'"
         }
+        if key != nil && *key == "address_data" {
+            var ip net.IP = val
+            return ip.String()
+        }
+        return fmt.Sprintf("'% x'", string(val))
     case List:
         return val.String()
     case Dict:
@@ -189,27 +203,29 @@ func val2str(item interface{}) string {
 }
 
 func (l *List) String() (res string) {
+    res = "["
     first := true
     for _, item := range *l {
         if first {
-            res = "[" + val2str(item)
+            first = false
         } else {
-            res = res + ", " + val2str(item)
+            res = res + ", "
         }
+        res = res + val2str(item, nil)
     }
     return res + "]"
 }
 
 func (d *Dict) String() (res string) {
+    res = "{"
     first := true
     for key, item := range *d {
         if first {
-            res = "{"
             first = false
         } else {
             res = res + ", "
         }
-        res = res + fmt.Sprintf("'%s': ", key) + val2str(item)
+        res = res + fmt.Sprintf("'%s': ", key) + val2str(item, &key)
     }
     return res + "}"
 }
