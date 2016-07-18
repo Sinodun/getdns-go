@@ -242,29 +242,23 @@ func (err *Error) Error() string {
 }
 
 func ConvertDNSNameToFQDN(b []byte) (string, error) {
-    first := true
     res := ""
     p := 0
     if len(b) < 1 {
         return "", &Error{RETURN_GENERIC_ERROR}
     }
-    for {
+    for b[p] != 0 {
         labelLen := int(b[p])
         p = p + 1
-        if labelLen == 0 {
-            break
-        }
         if labelLen > 63 || p+labelLen >= len(b) {
             return "", &Error{RETURN_GENERIC_ERROR}
         }
         labelContent := b[p : p+labelLen]
-        if first {
-            first = false
-            res = string(labelContent)
-        } else {
-            res = res + "." + string(labelContent)
-        }
+        res = res + string(labelContent) + "."
         p = p + int(labelLen)
+    }
+    if len(res) == 0 {
+        res = "."
     }
     return res, nil
 }

@@ -98,7 +98,7 @@ func TestAddress(t *testing.T) {
         return
     }
     fqdn, err := getdns.ConvertDNSNameToFQDN(qname)
-    if err != nil || fqdn != "www.lunch.org.uk" {
+    if err != nil || fqdn != "www.lunch.org.uk." {
         t.Errorf("QNAME incorrect: %s", qname)
     }
 
@@ -108,7 +108,7 @@ func TestAddress(t *testing.T) {
         return
     }
 
-    if can != "pigwidgeon.lunch.org.uk" {
+    if can != "pigwidgeon.lunch.org.uk." {
         t.Errorf("Wrong canonical name: %s", can)
     }
 
