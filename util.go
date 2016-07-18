@@ -170,7 +170,116 @@ func convertListToGo(list *C.getdns_list) (List, error) {
     return res, nil
 }
 
-func val2str(item interface{}) string {
+func convertDictToC(d *Dict) (*C.getdns_dict, error) {
+    var res *C.getdns_dict
+
+    if d == nil {
+        return nil, nil
+    }
+
+    res = C.getdns_dict_create()
+    if res == nil {
+        return nil, &Error{RETURN_MEMORY_ERROR}
+    }
+
+    for key, item := range *d {
+        ckey := C.CString(key)
+        defer C.free(unsafe.Pointer(ckey))
+
+        var rc C.getdns_return_t
+        switch val := item.(type) {
+        case int:
+            rc = C.getdns_dict_set_int(res, ckey, C.uint32_t(val))
+
+        case []byte:
+            var bindata C.getdns_bindata
+            bindata.size = C.size_t(len(val))
+            bindata.data = (*C.uint8_t)(&val[0])
+            rc = C.getdns_dict_set_bindata(res, ckey, &bindata)
+
+        case Dict:
+            d, err := convertDictToC(&val)
+            if err != nil {
+                C.getdns_dict_destroy(res)
+                return nil, err
+            }
+            rc = C.getdns_dict_set_dict(res, ckey, d)
+
+        case List:
+            l, err := convertListToC(&val)
+            if err != nil {
+                C.getdns_dict_destroy(res)
+                return nil, err
+            }
+            rc = C.getdns_dict_set_list(res, ckey, l)
+
+        default:
+            C.getdns_dict_destroy(res)
+            return nil, &Error{RETURN_WRONG_TYPE_REQUESTED}
+        }
+        if rc != RETURN_GOOD {
+            C.getdns_dict_destroy(res)
+            return nil, &Error{int(rc)}
+        }
+    }
+
+    return res, nil
+}
+
+func convertListToC(l *List) (*C.getdns_list, error) {
+    var res *C.getdns_list
+
+    if l == nil {
+        return nil, nil
+    }
+
+    res = C.getdns_list_create()
+    if res == nil {
+        return nil, &Error{RETURN_MEMORY_ERROR}
+    }
+
+    for i, item := range *l {
+        var rc C.getdns_return_t
+        switch val := item.(type) {
+        case int:
+            rc = C.getdns_list_set_int(res, C.size_t(i), C.uint32_t(val))
+
+        case []byte:
+            var bindata C.getdns_bindata
+            bindata.size = C.size_t(len(val))
+            bindata.data = (*C.uint8_t)(&val[0])
+            rc = C.getdns_list_set_bindata(res, C.size_t(i), &bindata)
+
+        case Dict:
+            d, err := convertDictToC(&val)
+            if err != nil {
+                C.getdns_list_destroy(res)
+                return nil, err
+            }
+            rc = C.getdns_list_set_dict(res, C.size_t(i), d)
+
+        case List:
+            l, err := convertListToC(&val)
+            if err != nil {
+                C.getdns_list_destroy(res)
+                return nil, err
+            }
+            rc = C.getdns_list_set_list(res, C.size_t(i), l)
+
+        default:
+            C.getdns_list_destroy(res)
+            return nil, &Error{RETURN_WRONG_TYPE_REQUESTED}
+        }
+        if rc != RETURN_GOOD {
+            C.getdns_list_destroy(res)
+            return nil, &Error{int(rc)}
+        }
+    }
+
+    return res, nil
+}
+
+func val2str(item interface{}, key *string) string {
     switch val := item.(type) {
     case int:
         return fmt.Sprintf("%d", val)
