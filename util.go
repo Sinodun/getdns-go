@@ -168,63 +168,48 @@ func convertListToGo(list *C.getdns_list) (List, error) {
     return res, nil
 }
 
+func val2str(item interface{}) string {
+    switch val := item.(type) {
+    case int:
+        return fmt.Sprintf("%d", val)
+    case []byte:
+        s, err := ConvertDNSNameToFQDN(val)
+        if err != nil {
+            return "<memory>"
+        } else {
+            return "'" + s + "'"
+        }
+    case List:
+        return val.String()
+    case Dict:
+        return val.String()
+    default:
+        return "<Unknown>"
+    }
+}
+
 func (l *List) String() (res string) {
-    res = "["
     first := true
     for _, item := range *l {
         if first {
-            first = false
+            res = "[" + val2str(item)
         } else {
-            res = res + ","
-        }
-        switch val := item.(type) {
-        case int:
-            res = res + fmt.Sprintf("%d", val)
-        case []byte:
-            s, err := ConvertDNSNameToFQDN(val)
-            if err != nil {
-                res = res + string(val)
-            } else {
-                res = res + s
-            }
-        case List:
-            res = res + val.String()
-        case Dict:
-            res = res + val.String()
-        default:
-            res = res + "Unknown"
+            res = res + ", " + val2str(item)
         }
     }
     return res + "]"
 }
 
 func (d *Dict) String() (res string) {
-    res = "{"
     first := true
     for key, item := range *d {
         if first {
+            res = "{"
             first = false
         } else {
-            res = res + ","
+            res = res + ", "
         }
-        res = res + fmt.Sprintf("%s: ", key)
-        switch val := item.(type) {
-        case int:
-            res = res + fmt.Sprintf("%d", val)
-        case []byte:
-            s, err := ConvertDNSNameToFQDN(val)
-            if err != nil {
-                res = res + string(val)
-            } else {
-                res = res + s
-            }
-        case List:
-            res = res + val.String()
-        case Dict:
-            res = res + val.String()
-        default:
-            res = res + "Unknown"
-        }
+        res = res + fmt.Sprintf("'%s': ", key) + val2str(item)
     }
     return res + "}"
 }
