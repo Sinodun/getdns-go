@@ -7,7 +7,13 @@ import "C"
 import (
     "net"
     "runtime"
+    "unsafe"
 )
+
+var cCANONICAL_NAME = C.CString("canonical_name")
+var cJUST_ADDRESS_ANSWERS = C.CString("just_address_answers")
+var cREPLIES_TREE = C.CString("replies_tree")
+var cVALIDATION_CHAIN = C.CString("validation_chain")
 
 type Result struct {
     res *C.getdns_dict
@@ -33,7 +39,9 @@ func (r *Result) IsValid() bool {
 
 func (r *Result) getInt(key string) (uint32, error) {
     var res C.uint32_t
-    rc := C.getdns_dict_get_int(r.res, C.CString(key), &res)
+    ckey := C.CString(key)
+    defer C.free(unsafe.Pointer(ckey))
+    rc := C.getdns_dict_get_int(r.res, ckey, &res)
     if rc != RETURN_GOOD {
         return 0, &Error{int(rc)}
     }
@@ -47,7 +55,7 @@ func (r *Result) AnswerType() (uint32, error) {
 func (r *Result) CanonicalName() (string, error) {
     var bindata *C.getdns_bindata
 
-    rc := C.getdns_dict_get_bindata(r.res, C.CString("canonical_name"), &bindata)
+    rc := C.getdns_dict_get_bindata(r.res, cCANONICAL_NAME, &bindata)
     if rc != RETURN_GOOD {
         return "", &Error{int(rc)}
     }
@@ -64,7 +72,7 @@ func (r *Result) CanonicalName() (string, error) {
 func (r *Result) JustAddressAnswers() ([]map[string]string, error) {
     var list *C.getdns_list
 
-    rc := C.getdns_dict_get_list(r.res, C.CString("just_address_answers"), &list)
+    rc := C.getdns_dict_get_list(r.res, cJUST_ADDRESS_ANSWERS, &list)
     if rc != RETURN_GOOD {
         return nil, &Error{int(rc)}
     }
@@ -100,7 +108,7 @@ func (r *Result) JustAddressAnswers() ([]map[string]string, error) {
 func (r *Result) RepliesTree() (List, error) {
     var list *C.getdns_list
 
-    rc := C.getdns_dict_get_list(r.res, C.CString("replies_tree"), &list)
+    rc := C.getdns_dict_get_list(r.res, cREPLIES_TREE, &list)
     if rc != RETURN_GOOD {
         return nil, &Error{int(rc)}
     }
@@ -110,7 +118,7 @@ func (r *Result) RepliesTree() (List, error) {
 func (r *Result) ValidationChain() (List, error) {
     var list *C.getdns_list
 
-    rc := C.getdns_dict_get_list(r.res, C.CString("validation_chain"), &list)
+    rc := C.getdns_dict_get_list(r.res, cVALIDATION_CHAIN, &list)
     if rc != RETURN_GOOD {
         return nil, &Error{int(rc)}
     }
