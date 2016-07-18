@@ -105,6 +105,10 @@ func (r *Result) JustAddressAnswers() ([]map[string]string, error) {
     return res, nil
 }
 
+func (r *Result) RepliesFull() (Dict, error) {
+    return convertDictToGo(r.res)
+}
+
 func (r *Result) RepliesTree() (List, error) {
     var list *C.getdns_list
 
