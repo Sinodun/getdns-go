@@ -98,7 +98,7 @@ func convertDictToGo(dict *C.getdns_dict) (Dict, error) {
             res[keyName] = bindataToByteSlice(bindataItem)
 
         default:
-            return nil, &Error{RETURN_GENERIC_ERROR}
+            return nil, &Error{RETURN_WRONG_TYPE_REQUESTED}
         }
     }
 
@@ -163,7 +163,7 @@ func convertListToGo(list *C.getdns_list) (List, error) {
             res = append(res, bindataToByteSlice(bindataItem))
 
         default:
-            return nil, &Error{RETURN_GENERIC_ERROR}
+            return nil, &Error{RETURN_WRONG_TYPE_REQUESTED}
         }
     }
 
