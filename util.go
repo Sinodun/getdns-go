@@ -12,15 +12,7 @@ import (
 )
 
 func bindataToByteSlice(bindata *C.getdns_bindata) []byte {
-    p := uintptr(unsafe.Pointer(bindata.data))
-    var res = make([]byte, int(bindata.size))
-
-    for i := 0; i < len(res); i++ {
-        res[i] = byte(*(*C.uint8_t)(unsafe.Pointer(p)))
-        p++
-    }
-
-    return res
+    return C.GoBytes(unsafe.Pointer(bindata.data), C.int(bindata.size))
 }
 
 func convertDictToGo(dict *C.getdns_dict) (Dict, error) {
