@@ -6,6 +6,7 @@ import "C"
 
 import (
     "runtime"
+    "unsafe"
 )
 
 type Context struct {
@@ -40,9 +41,17 @@ func (c *Context) IsValid() bool {
     return c.ctx != nil
 }
 
-func (c *Context) Address(name string) (*Result, error) {
+func (c *Context) Address(name string, exts *Dict) (*Result, error) {
     var res *C.getdns_dict
-    rc := C.getdns_address_sync(c.ctx, C.CString(name), nil, &res)
+    var cexts *C.getdns_dict
+    cexts, err := convertDictToC(exts)
+    defer C.getdns_dict_destroy(cexts)
+    if err != nil {
+        return nil, err
+    }
+    cname := C.CString(name)
+    defer C.free(unsafe.Pointer(cname))
+    rc := C.getdns_address_sync(c.ctx, cname, cexts, &res)
     if rc != RETURN_GOOD {
         return nil, &Error{int(rc)}
     }
