@@ -118,3 +118,40 @@ func TestAddress(t *testing.T) {
         t.Error("ValidationChain found!")
     }
 }
+
+func TestGeneral(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    exts := make(getdns.Dict, 1)
+    exts["return_both_v4_and_v6"] = getdns.EXTENSION_TRUE
+    res, err := c.General("lunch.org.uk", getdns.RRTYPE_MX, &exts)
+    if res == nil {
+        t.Fatalf("No Result created: %s", err)
+    }
+
+    rt, err := res.RepliesTree()
+    if err != nil {
+        t.Errorf("No RepliesTree: %s", err)
+    } else {
+        d, ok := rt[0].(getdns.Dict)
+        if !ok {
+            t.Error("RepliesTree: no dict at [0]")
+        } else {
+            q, ok := d["question"].(getdns.Dict)
+            if !ok {
+                t.Error("RepliesTree: no question")
+            } else {
+                qtype, ok := q["qtype"].(int)
+                if !ok {
+                    t.Error("RepliesTree: no qtype")
+                } else if qtype != getdns.RRTYPE_MX {
+                    t.Errorf("QTYPE incorrect: %d", qtype)
+                }
+            }
+        }
+    }
+}

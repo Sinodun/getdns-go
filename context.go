@@ -58,3 +58,21 @@ func (c *Context) Address(name string, exts *Dict) (*Result, error) {
 
     return createResult(res), nil
 }
+
+func (c *Context) General(name string, requestType uint, exts *Dict) (*Result, error) {
+    var res *C.getdns_dict
+    var cexts *C.getdns_dict
+    cexts, err := convertDictToC(exts)
+    defer C.getdns_dict_destroy(cexts)
+    if err != nil {
+        return nil, err
+    }
+    cname := C.CString(name)
+    defer C.free(unsafe.Pointer(cname))
+    rc := C.getdns_general_sync(c.ctx, cname, C.uint16_t(requestType), cexts, &res)
+    if rc != RETURN_GOOD {
+        return nil, &Error{int(rc)}
+    }
+
+    return createResult(res), nil
+}
