@@ -1,7 +1,35 @@
 package getdns
 
-// #cgo LDFLAGS: -lgetdns
-// #include <getdns/getdns_extra.h>
+/*
+#include <getdns/getdns_extra.h>
+
+// When giving a pointer to a C routine, cgo needs the pointer
+// conversion via unsafe.Pointer() to be on the function call line.
+// This is not possible with the getdns_(dict|list)_set_bindata()
+// routines, so supply C routines with interfaces that allow this to happen.
+
+getdns_return_t
+dict_set_bindata(getdns_dict *dict, char *name, uint8_t *data, size_t datalen)
+{
+    getdns_bindata bindata;
+
+    bindata.size = datalen;
+    bindata.data = data;
+    return getdns_dict_set_bindata(dict, name, &bindata);
+}
+
+getdns_return_t
+list_set_bindata (getdns_list *list, size_t index, uint8_t *data, size_t datalen)
+{
+    getdns_bindata bindata;
+
+    bindata.size = datalen;
+    bindata.data = data;
+    return getdns_list_set_bindata(list, index, &bindata);
+}
+
+#cgo LDFLAGS: -lgetdns
+*/
 import "C"
 
 import (
@@ -181,10 +209,7 @@ func convertDictToC(d *Dict) (*C.getdns_dict, error) {
             rc = C.getdns_dict_set_int(res, ckey, C.uint32_t(val))
 
         case []byte:
-            var bindata C.getdns_bindata
-            bindata.size = C.size_t(len(val))
-            bindata.data = (*C.uint8_t)(&val[0])
-            rc = C.getdns_dict_set_bindata(res, ckey, &bindata)
+            rc = C.dict_set_bindata(res, ckey, (*C.uint8_t)(unsafe.Pointer(&val[0])), C.size_t(len(val)))
 
         case Dict:
             d, err := convertDictToC(&val)
@@ -234,10 +259,7 @@ func convertListToC(l *List) (*C.getdns_list, error) {
             rc = C.getdns_list_set_int(res, C.size_t(i), C.uint32_t(val))
 
         case []byte:
-            var bindata C.getdns_bindata
-            bindata.size = C.size_t(len(val))
-            bindata.data = (*C.uint8_t)(&val[0])
-            rc = C.getdns_list_set_bindata(res, C.size_t(i), &bindata)
+            rc = C.list_set_bindata(res, C.size_t(i), (*C.uint8_t)(unsafe.Pointer(&val[0])), C.size_t(len(val)))
 
         case Dict:
             d, err := convertDictToC(&val)
