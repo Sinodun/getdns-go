@@ -1,7 +1,7 @@
 package getdns
 
 // #cgo LDFLAGS: -lgetdns
-// #include <getdns/getdns.h>
+// #include <getdns/getdns_extra.h>
 import "C"
 
 import (
@@ -274,6 +274,95 @@ func convertListToC(l *List) (*C.getdns_list, error) {
     }
 
     return res, nil
+}
+
+func checkExtensions(exts *Dict) error {
+    if exts == nil {
+        return nil
+    }
+
+    var retcall string
+    var ok bool
+    if C.GETDNS_NUMERIC_VERSION < 0x00090000 {
+        retcall = "return_call_debugging"
+    } else {
+        retcall = "return_call_reporting"
+    }
+    for key, item := range *exts {
+        switch key {
+        case retcall,
+            "add_warning_for_bad_dns",
+            "dnssec_return_status",
+            "dnssec_return_all_statuses",
+            "dnssec_return_only_secure",
+            "dnssec_return_validation_chain",
+            "return_api_information",
+            "return_both_v4_and_v6":
+            ival, ok := item.(int)
+            if !ok || (ival != EXTENSION_TRUE && ival != EXTENSION_FALSE) {
+                return &returnCodeError{RETURN_EXTENSION_MISFORMAT}
+            }
+
+        case "specify_class":
+            _, ok = item.(int)
+            if !ok {
+                return &returnCodeError{RETURN_EXTENSION_MISFORMAT}
+            }
+
+        case "add_opt_parameters":
+            optdict, ok := item.(Dict)
+            if !ok {
+                return &returnCodeError{RETURN_EXTENSION_MISFORMAT}
+            }
+            for optkey, optval := range optdict {
+                switch optkey {
+                case "maximum_udp_payload_size",
+                    "extended_rcode",
+                    "version",
+                    "do_bit":
+                    _, ok = optval.(int)
+                    if !ok {
+                        return &returnCodeError{RETURN_EXTENSION_MISFORMAT}
+                    }
+
+                case "options":
+                    l, ok := optval.(List)
+                    if !ok {
+                        return &returnCodeError{RETURN_EXTENSION_MISFORMAT}
+                    }
+                    for _, listitem := range l {
+                        ld, ok := listitem.(Dict)
+                        if !ok {
+                            return &returnCodeError{RETURN_EXTENSION_MISFORMAT}
+                        }
+                        for lkey, ldata := range ld {
+                            switch lkey {
+                            case "option_code":
+                                _, ok = ldata.(int)
+
+                            case "option_data":
+                                _, ok = ldata.([]byte)
+
+                            default:
+                                ok = false
+                            }
+                        }
+                        if !ok {
+                            return &returnCodeError{RETURN_EXTENSION_MISFORMAT}
+                        }
+                    }
+
+                default:
+                    return &returnCodeError{RETURN_EXTENSION_MISFORMAT}
+                }
+            }
+
+        default:
+            return &returnCodeError{RETURN_NO_SUCH_EXTENSION}
+        }
+    }
+
+    return nil
 }
 
 func val2str(item interface{}, key *string) string {

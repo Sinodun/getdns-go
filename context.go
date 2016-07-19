@@ -42,9 +42,13 @@ func (c *Context) IsValid() bool {
 }
 
 func (c *Context) Address(name string, exts *Dict) (*Result, error) {
+    err := checkExtensions(exts)
+    if err != nil {
+        return nil, err
+    }
     var res *C.getdns_dict
     var cexts *C.getdns_dict
-    cexts, err := convertDictToC(exts)
+    cexts, err = convertDictToC(exts)
     defer C.getdns_dict_destroy(cexts)
     if err != nil {
         return nil, err
@@ -60,9 +64,13 @@ func (c *Context) Address(name string, exts *Dict) (*Result, error) {
 }
 
 func (c *Context) General(name string, requestType uint, exts *Dict) (*Result, error) {
+    err := checkExtensions(exts)
+    if err != nil {
+        return nil, err
+    }
     var res *C.getdns_dict
     var cexts *C.getdns_dict
-    cexts, err := convertDictToC(exts)
+    cexts, err = convertDictToC(exts)
     defer C.getdns_dict_destroy(cexts)
     if err != nil {
         return nil, err
@@ -78,9 +86,13 @@ func (c *Context) General(name string, requestType uint, exts *Dict) (*Result, e
 }
 
 func (c *Context) Service(name string, exts *Dict) (*Result, error) {
+    err := checkExtensions(exts)
+    if err != nil {
+        return nil, err
+    }
     var res *C.getdns_dict
     var cexts *C.getdns_dict
-    cexts, err := convertDictToC(exts)
+    cexts, err = convertDictToC(exts)
     defer C.getdns_dict_destroy(cexts)
     if err != nil {
         return nil, err
