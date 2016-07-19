@@ -229,3 +229,24 @@ func TestHostname(t *testing.T) {
         }
     }
 }
+
+func TestAppendName(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    err = c.SetAppendName(getdns.APPEND_NAME_NEVER)
+    if err != nil {
+        t.Fatalf("SetAppendName() failed: %s", err)
+    }
+
+    appendName, err := c.GetAppendName()
+    if err != nil {
+        t.Fatalf("No AppendName: %s", err)
+    }
+    if appendName != getdns.APPEND_NAME_NEVER {
+        t.Fatalf("Bad AppendName: %d", appendName)
+    }
+}

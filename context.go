@@ -1,7 +1,7 @@
 package getdns
 
 // #cgo LDFLAGS: -lgetdns
-// #include <getdns/getdns.h>
+// #include <getdns/getdns_extra.h>
 import "C"
 
 import (
@@ -135,4 +135,21 @@ func (c *Context) Service(name string, exts *Dict) (*Result, error) {
     }
 
     return createResult(res), nil
+}
+
+func (c *Context) GetAppendName() (int, error) {
+    var res C.getdns_append_name_t
+    rc := C.getdns_context_get_append_name(c.ctx, &res)
+    if rc != RETURN_GOOD {
+        return 0, &returnCodeError{int(rc)}
+    }
+    return int(res), nil
+}
+
+func (c *Context) SetAppendName(appendName int) error {
+    rc := C.getdns_context_set_append_name(c.ctx, C.getdns_append_name_t(appendName))
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+    return nil
 }
