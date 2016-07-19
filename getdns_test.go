@@ -190,3 +190,42 @@ func TestService(t *testing.T) {
         }
     }
 }
+
+func TestHostname(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    addr := make(getdns.Dict, 2)
+    addr["address_type"] = "IPv6"
+    addr["address_data"] = "2001:41c8:51:189:feff:ff:fe00:b1c"
+
+    res, err := c.Hostname(addr, nil)
+    if res == nil {
+        t.Fatalf("No Result created: %s", err)
+    }
+
+    rt, err := res.RepliesTree()
+    if err != nil {
+        t.Errorf("No RepliesTree: %s", err)
+    } else {
+        d, ok := rt[0].(getdns.Dict)
+        if !ok {
+            t.Error("RepliesTree: no dict at [0]")
+        } else {
+            q, ok := d["question"].(getdns.Dict)
+            if !ok {
+                t.Error("RepliesTree: no question")
+            } else {
+                qtype, ok := q["qtype"].(int)
+                if !ok {
+                    t.Error("RepliesTree: no qtype")
+                } else if qtype != getdns.RRTYPE_PTR {
+                    t.Errorf("QTYPE incorrect: %d", qtype)
+                }
+            }
+        }
+    }
+}

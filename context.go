@@ -85,6 +85,36 @@ func (c *Context) General(name string, requestType uint, exts *Dict) (*Result, e
     return createResult(res), nil
 }
 
+func (c *Context) Hostname(address Dict, exts *Dict) (*Result, error) {
+    getdnsAddr, err := convertAddressDict(address)
+    if err != nil {
+        return nil, err
+    }
+    err = checkExtensions(exts)
+    if err != nil {
+        return nil, err
+    }
+    var res *C.getdns_dict
+    var caddr *C.getdns_dict
+    caddr, err = convertDictToC(&getdnsAddr)
+    defer C.getdns_dict_destroy(caddr)
+    if err != nil {
+        return nil, err
+    }
+    var cexts *C.getdns_dict
+    cexts, err = convertDictToC(exts)
+    defer C.getdns_dict_destroy(cexts)
+    if err != nil {
+        return nil, err
+    }
+    rc := C.getdns_hostname_sync(c.ctx, caddr, cexts, &res)
+    if rc != RETURN_GOOD {
+        return nil, &returnCodeError{int(rc)}
+    }
+
+    return createResult(res), nil
+}
+
 func (c *Context) Service(name string, exts *Dict) (*Result, error) {
     err := checkExtensions(exts)
     if err != nil {

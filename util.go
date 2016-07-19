@@ -290,6 +290,90 @@ func convertListToC(l *List) (*C.getdns_list, error) {
     return res, nil
 }
 
+func convertAddressDict(addr Dict) (Dict, error) {
+    if addr == nil {
+        return nil, &returnCodeError{RETURN_INVALID_PARAMETER}
+    }
+
+    addrType, ok := addr["address_type"].(string)
+    if !ok || (addrType != "IPv4" && addrType != "IPv6") {
+        return nil, &returnCodeError{RETURN_INVALID_PARAMETER}
+    }
+
+    addrData, ok := addr["address_data"].(string)
+    if !ok {
+        return nil, &returnCodeError{RETURN_INVALID_PARAMETER}
+    }
+    addrIP := net.ParseIP(addrData)
+    if addrIP == nil {
+        return nil, &returnCodeError{RETURN_INVALID_PARAMETER}
+    }
+
+    if addrType == "IPv4" {
+        addrIP = addrIP.To4()
+    } else {
+        addrIP = addrIP.To16()
+    }
+    if addrIP == nil {
+        return nil, &returnCodeError{RETURN_INVALID_PARAMETER}
+    }
+
+    res := make(Dict, 0)
+    res["address_type"] = []byte(addrType)
+    res["address_data"] = []byte(addrIP)
+
+    for key, item := range addr {
+        switch key {
+        case "address_type", "address_data":
+
+        case "scope_id",
+            "tsig_name",
+            "tsig_algorithm",
+            "tsig_secret":
+            s, ok := item.(string)
+            if !ok {
+                return nil, &returnCodeError{RETURN_INVALID_PARAMETER}
+            }
+            res[key] = []byte(s)
+
+        case "tls_pubkey_pinset":
+            l, ok := item.(List)
+            if !ok || len(l) == 0 {
+                return nil, &returnCodeError{RETURN_INVALID_PARAMETER}
+            }
+            pubkeys := make(List, 0, len(l))
+            for _, litem := range l {
+                s, ok := litem.(string)
+                if !ok {
+                    return nil, &returnCodeError{RETURN_INVALID_PARAMETER}
+                }
+                cs := C.CString(s)
+                defer C.free(unsafe.Pointer(cs))
+                pkPin := C.getdns_pubkey_pin_create_from_string(nil, cs)
+                if pkPin == nil {
+                    return nil, &returnCodeError{RETURN_INVALID_PARAMETER}
+                }
+                keyd, err := convertDictToGo(pkPin)
+                C.getdns_dict_destroy(pkPin)
+                if err != nil {
+                    return nil, &returnCodeError{RETURN_INVALID_PARAMETER}
+                }
+                pubkeys = append(pubkeys, keyd)
+            }
+            res[key] = pubkeys
+
+        case "port", "tls_port":
+            ival := item.(int)
+            res[key] = ival
+
+        default:
+            return nil, &returnCodeError{RETURN_INVALID_PARAMETER}
+        }
+    }
+
+    return res, nil
+}
+
 func checkExtensions(exts *Dict) error {
     if exts == nil {
         return nil
