@@ -3,7 +3,7 @@ package getdns
 // #include <getdns/getdns.h>
 import "C"
 
-// getdns result codes.
+// Result codes.returned by getdns.
 const (
     RETURN_GOOD                        = C.GETDNS_RETURN_GOOD
     RETURN_GENERIC_ERROR               = C.GETDNS_RETURN_GENERIC_ERROR
@@ -22,7 +22,7 @@ const (
     RETURN_NO_IMPLEMENTED              = C.GETDNS_RETURN_NOT_IMPLEMENTED
 )
 
-// response status codes
+// Response status codes set by getdns.
 const (
     RESPSTATUS_GOOD                 = C.GETDNS_RESPSTATUS_GOOD
     RESPSTATUS_NO_NAME              = C.GETDNS_RESPSTATUS_NO_NAME
@@ -31,19 +31,19 @@ const (
     RESPSTATUS_NO_ALL_BOGUS_ANSWERS = C.GETDNS_RESPSTATUS_ALL_BOGUS_ANSWERS
 )
 
-// response anwer types
+// Response anwer types.
 const (
     NAMETYPE_DNS  = C.GETDNS_NAMETYPE_DNS
     NAMETYPE_WINS = C.GETDNS_NAMETYPE_WINS
 )
 
-// extension request values
+// Extension request values.
 const (
     EXTENSION_TRUE  = C.GETDNS_EXTENSION_TRUE
     EXTENSION_FALSE = C.GETDNS_EXTENSION_FALSE
 )
 
-// extension response values
+// Extension response values.
 const (
     BAD_DNS_CNAME_IN_TARGET               = C.GETDNS_BAD_DNS_CNAME_IN_TARGET
     BAD_DNS_ALL_NUMERIC_LABEL             = C.GETDNS_BAD_DNS_ALL_NUMERIC_LABEL
