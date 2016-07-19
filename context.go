@@ -76,3 +76,21 @@ func (c *Context) General(name string, requestType uint, exts *Dict) (*Result, e
 
     return createResult(res), nil
 }
+
+func (c *Context) Service(name string, exts *Dict) (*Result, error) {
+    var res *C.getdns_dict
+    var cexts *C.getdns_dict
+    cexts, err := convertDictToC(exts)
+    defer C.getdns_dict_destroy(cexts)
+    if err != nil {
+        return nil, err
+    }
+    cname := C.CString(name)
+    defer C.free(unsafe.Pointer(cname))
+    rc := C.getdns_service_sync(c.ctx, cname, cexts, &res)
+    if rc != RETURN_GOOD {
+        return nil, &Error{int(rc)}
+    }
+
+    return createResult(res), nil
+}
