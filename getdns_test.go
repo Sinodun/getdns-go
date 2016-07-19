@@ -32,9 +32,7 @@ func TestAddress(t *testing.T) {
     }
     defer c.Destroy()
 
-    exts := make(getdns.Dict, 1)
-    exts["return_both_v4_and_v6"] = getdns.EXTENSION_TRUE
-    res, err := c.Address("www.lunch.org.uk", &exts)
+    res, err := c.Address("www.lunch.org.uk", nil)
     if res == nil {
         t.Fatalf("No Result created: %s", err)
     }
