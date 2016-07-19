@@ -43,7 +43,7 @@ func (r *Result) getInt(key string) (uint32, error) {
     defer C.free(unsafe.Pointer(ckey))
     rc := C.getdns_dict_get_int(r.res, ckey, &res)
     if rc != RETURN_GOOD {
-        return 0, &Error{int(rc)}
+        return 0, &returnCodeError{int(rc)}
     }
     return uint32(res), nil
 }
@@ -57,7 +57,7 @@ func (r *Result) CanonicalName() (string, error) {
 
     rc := C.getdns_dict_get_bindata(r.res, cCANONICAL_NAME, &bindata)
     if rc != RETURN_GOOD {
-        return "", &Error{int(rc)}
+        return "", &returnCodeError{int(rc)}
     }
 
     b := bindataToByteSlice(bindata)
@@ -74,7 +74,7 @@ func (r *Result) JustAddressAnswers() ([]map[string]string, error) {
 
     rc := C.getdns_dict_get_list(r.res, cJUST_ADDRESS_ANSWERS, &list)
     if rc != RETURN_GOOD {
-        return nil, &Error{int(rc)}
+        return nil, &returnCodeError{int(rc)}
     }
 
     l, err := convertListToGo(list)
@@ -87,17 +87,17 @@ func (r *Result) JustAddressAnswers() ([]map[string]string, error) {
         item := make(map[string]string)
         d, ok := addrs.(Dict)
         if !ok {
-            return nil, &Error{RETURN_GENERIC_ERROR}
+            return nil, &returnCodeError{RETURN_GENERIC_ERROR}
         }
         addrType, ok := d["address_type"].([]byte)
         if !ok {
-            return nil, &Error{RETURN_GENERIC_ERROR}
+            return nil, &returnCodeError{RETURN_GENERIC_ERROR}
         }
         item["address_type"] = string(addrType)
         var ad net.IP
         ad, ok = d["address_data"].([]byte)
         if !ok {
-            return nil, &Error{RETURN_GENERIC_ERROR}
+            return nil, &returnCodeError{RETURN_GENERIC_ERROR}
         }
         item["address_data"] = ad.String()
         res = append(res, item)
@@ -114,7 +114,7 @@ func (r *Result) RepliesTree() (List, error) {
 
     rc := C.getdns_dict_get_list(r.res, cREPLIES_TREE, &list)
     if rc != RETURN_GOOD {
-        return nil, &Error{int(rc)}
+        return nil, &returnCodeError{int(rc)}
     }
     return convertListToGo(list)
 }
@@ -124,7 +124,7 @@ func (r *Result) ValidationChain() (List, error) {
 
     rc := C.getdns_dict_get_list(r.res, cVALIDATION_CHAIN, &list)
     if rc != RETURN_GOOD {
-        return nil, &Error{int(rc)}
+        return nil, &returnCodeError{int(rc)}
     }
     return convertListToGo(list)
 }
