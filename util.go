@@ -511,6 +511,7 @@ func val2str(item interface{}, key *string) string {
     switch val := item.(type) {
     case int:
         return fmt.Sprintf("%d", val)
+
     case string:
         return "'" + val + "'"
 
