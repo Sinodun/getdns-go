@@ -491,6 +491,10 @@ func val2str(item interface{}, key *string) string {
     case int:
         return fmt.Sprintf("%d", val)
     case []byte:
+        if key != nil && *key == "address_data" {
+            var ip net.IP = val
+            return "'" + ip.String() + "'"
+        }
         printable := true
         for _, c := range string(val) {
             if !unicode.IsPrint(c) {
@@ -503,10 +507,6 @@ func val2str(item interface{}, key *string) string {
         s, err := ConvertDNSNameToFQDN(val)
         if err == nil {
             return "'" + s + "'"
-        }
-        if key != nil && *key == "address_data" {
-            var ip net.IP = val
-            return "'" + ip.String() + "'"
         }
         return fmt.Sprintf("'% x'", string(val))
     case List:
