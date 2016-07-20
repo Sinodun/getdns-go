@@ -397,6 +397,27 @@ func convertAddressDictToUserTypes(addr Dict) (Dict, error) {
     return res, nil
 }
 
+func makeAddressDictList(list *C.getdns_list) ([]Dict, error) {
+    l, err := convertListToGo(list)
+    if err != nil {
+        return nil, err
+    }
+
+    res := make([]Dict, 0, len(l))
+    for _, addrs := range l {
+        d, ok := addrs.(Dict)
+        if !ok {
+            return nil, &returnCodeError{RETURN_GENERIC_ERROR}
+        }
+        item, err := convertAddressDictToUserTypes(d)
+        if err != nil {
+            return nil, err
+        }
+        res = append(res, item)
+    }
+    return res, nil
+}
+
 func checkExtensions(exts *Dict) error {
     if exts == nil {
         return nil

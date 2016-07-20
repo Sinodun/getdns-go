@@ -76,24 +76,7 @@ func (r *Result) JustAddressAnswers() ([]Dict, error) {
         return nil, &returnCodeError{int(rc)}
     }
 
-    l, err := convertListToGo(list)
-    if err != nil {
-        return nil, err
-    }
-
-    res := make([]Dict, 0, len(l))
-    for _, addrs := range l {
-        d, ok := addrs.(Dict)
-        if !ok {
-            return nil, &returnCodeError{RETURN_GENERIC_ERROR}
-        }
-        item, err := convertAddressDictToUserTypes(d)
-        if err != nil {
-            return nil, err
-        }
-        res = append(res, item)
-    }
-    return res, nil
+    return makeAddressDictList(list)
 }
 
 func (r *Result) RepliesFull() (Dict, error) {
