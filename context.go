@@ -234,3 +234,27 @@ func (c *Context) SetDNSSECAllowedSkew(skew uint) error {
 
     return nil
 }
+
+func (c *Context) GetDNSSECTrustAnchors() (List, error) {
+    var list *C.getdns_list
+    rc := C.getdns_context_get_dnssec_trust_anchors(c.ctx, &list)
+    if rc != RETURN_GOOD {
+        return nil, &returnCodeError{int(rc)}
+    }
+
+    return convertListToGo(list)
+}
+
+func (c *Context) SetDNSSECTrustAnchors(anchors List) error {
+    canchors, err := convertListToC(&anchors)
+    if err != nil {
+        return err
+    }
+    defer C.getdns_list_destroy(canchors)
+    rc := C.getdns_context_set_dnssec_trust_anchors(c.ctx, canchors)
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+
+    return nil
+}

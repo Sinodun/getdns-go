@@ -327,3 +327,20 @@ func TestDNSSECAllowedSkew(t *testing.T) {
         t.Fatal("Incorrect skew: %d", skew)
     }
 }
+
+func TestDNSSECTrustAnchors(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    anchors, err := c.GetDNSSECTrustAnchors()
+    if err != nil {
+        t.Fatalf("No trust anchors: %s", err)
+    }
+    err = c.SetDNSSECTrustAnchors(anchors)
+    if err != nil {
+        t.Fatalf("Can't set trust anchors: %s", err)
+    }
+}
