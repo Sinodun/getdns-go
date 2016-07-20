@@ -214,3 +214,23 @@ func (c *Context) SetDNSTransportList(list []int) error {
 
     return nil
 }
+
+func (c *Context) GetDNSSECAllowedSkew() (uint, error) {
+    var res C.uint32_t
+    rc := C.getdns_context_get_dnssec_allowed_skew(c.ctx, &res)
+    if rc != RETURN_GOOD {
+        return 0, &returnCodeError{int(rc)}
+    }
+
+    return uint(res), nil
+}
+
+func (c *Context) SetDNSSECAllowedSkew(skew uint) error {
+    var cskew C.uint32_t = C.uint32_t(skew)
+    rc := C.getdns_context_set_dnssec_allowed_skew(c.ctx, cskew)
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+
+    return nil
+}

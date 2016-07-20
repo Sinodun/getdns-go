@@ -303,6 +303,27 @@ func TestDNSTransportList(t *testing.T) {
     }
     if len(tl) != 3 ||
         (tl[0] != getdns.TRANSPORT_UDP && tl[1] != getdns.TRANSPORT_TCP && tl[2] != getdns.TRANSPORT_TLS) {
-        t.Fatalf("Incorrect transport list: %s", err)
+        t.Fatal("Incorrect transport list")
+    }
+}
+
+func TestDNSSECAllowedSkew(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    err = c.SetDNSSECAllowedSkew(1234)
+    if err != nil {
+        t.Fatalf("Can't set allowed skew: %s", err)
+    }
+
+    skew, err := c.GetDNSSECAllowedSkew()
+    if err != nil {
+        t.Fatalf("No allowed skew: %s", err)
+    }
+    if skew != 1234 {
+        t.Fatal("Incorrect skew: %d", skew)
     }
 }
