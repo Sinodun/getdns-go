@@ -386,3 +386,24 @@ func TestEDNSDoBit(t *testing.T) {
         t.Fatal("Incorrect EDBS: %v", edns)
     }
 }
+
+func TestEDNSExtendedRcode(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    err = c.SetEDNSExtendedRcode(123)
+    if err != nil {
+        t.Fatalf("Can't set EDNS Do: %s", err)
+    }
+
+    edns, err := c.GetEDNSExtendedRcode()
+    if err != nil {
+        t.Fatalf("No EDNS Do: %s", err)
+    }
+    if edns != 123 {
+        t.Fatal("Incorrect EDBS: %v", edns)
+    }
+}

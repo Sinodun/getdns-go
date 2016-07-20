@@ -304,3 +304,22 @@ func (c *Context) SetEDNSDoBit(newval bool) error {
 
     return nil
 }
+
+func (c *Context) GetEDNSExtendedRcode() (uint, error) {
+    var val C.uint8_t
+    rc := C.getdns_context_get_edns_extended_rcode(c.ctx, &val)
+    if rc != RETURN_GOOD {
+        return 0, &returnCodeError{int(rc)}
+    }
+
+    return uint(val), nil
+}
+
+func (c *Context) SetEDNSExtendedRcode(newval uint) error {
+    rc := C.getdns_context_set_edns_extended_rcode(c.ctx, C.uint8_t(newval))
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+
+    return nil
+}
