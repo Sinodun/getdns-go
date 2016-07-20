@@ -449,3 +449,51 @@ func TestEDNSVersion(t *testing.T) {
         t.Fatal("Incorrect EDDNS version: %v", edns)
     }
 }
+
+func TestFollowRedirects(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    // Not implemented on 0.9.0.
+    err = c.SetFollowRedirects(getdns.REDIRECTS_DO_NOT_FOLLOW)
+    if err != nil {
+        gderr, ok := err.(getdns.Error)
+        if ok {
+            if gderr.ReturnCode() != getdns.RETURN_NOT_IMPLEMENTED {
+                t.Fatalf("Unexpected FollowRedirects error: %v", gderr.ReturnCode())
+            }
+        }
+    } else {
+        val, err := c.GetFollowRedirects()
+        if err != nil {
+            t.Fatalf("Can't get follow redirects: %s", err)
+        }
+        if val != getdns.REDIRECTS_DO_NOT_FOLLOW {
+            t.Fatalf("Unexpected follow redirects: %v", val)
+        }
+    }
+}
+
+func TestIdleTimeout(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    err = c.SetIdleTimeout(1234)
+    if err != nil {
+        t.Fatalf("Can't set idle timeout: %s", err)
+    }
+
+    val, err := c.GetIdleTimeout()
+    if err != nil {
+        t.Fatalf("No idle timeout: %s", err)
+    }
+    if val != 1234 {
+        t.Fatal("Incorrect idle timeout: %v", val)
+    }
+}

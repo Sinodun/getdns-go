@@ -361,3 +361,41 @@ func (c *Context) SetEDNSVersion(newval uint8) error {
 
     return nil
 }
+
+func (c *Context) GetFollowRedirects() (int, error) {
+    var val C.getdns_redirects_t
+    rc := C.getdns_context_get_follow_redirects(c.ctx, &val)
+    if rc != RETURN_GOOD {
+        return 0, &returnCodeError{int(rc)}
+    }
+
+    return int(val), nil
+}
+
+func (c *Context) SetFollowRedirects(newval int) error {
+    rc := C.getdns_context_set_follow_redirects(c.ctx, C.getdns_redirects_t(newval))
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+
+    return nil
+}
+
+func (c *Context) GetIdleTimeout() (uint64, error) {
+    var val C.uint64_t
+    rc := C.getdns_context_get_idle_timeout(c.ctx, &val)
+    if rc != RETURN_GOOD {
+        return 0, &returnCodeError{int(rc)}
+    }
+
+    return uint64(val), nil
+}
+
+func (c *Context) SetIdleTimeout(newval uint64) error {
+    rc := C.getdns_context_set_idle_timeout(c.ctx, C.uint64_t(newval))
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+
+    return nil
+}
