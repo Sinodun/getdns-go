@@ -365,3 +365,24 @@ func TestEDNSClientSubnetPrivate(t *testing.T) {
         t.Fatal("Incorrect EDBS: %d", edns)
     }
 }
+
+func TestEDNSDoBit(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    err = c.SetEDNSDoBit(true)
+    if err != nil {
+        t.Fatalf("Can't set EDNS Do: %s", err)
+    }
+
+    edns, err := c.GetEDNSDoBit()
+    if err != nil {
+        t.Fatalf("No EDNS Do: %s", err)
+    }
+    if !edns {
+        t.Fatal("Incorrect EDBS: %v", edns)
+    }
+}

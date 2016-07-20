@@ -281,3 +281,26 @@ func (c *Context) SetEDNSClientSubnetPrivate(private bool) error {
 
     return nil
 }
+
+func (c *Context) GetEDNSDoBit() (bool, error) {
+    var val C.uint8_t
+    rc := C.getdns_context_get_edns_do_bit(c.ctx, &val)
+    if rc != RETURN_GOOD {
+        return false, &returnCodeError{int(rc)}
+    }
+
+    return (val == 1), nil
+}
+
+func (c *Context) SetEDNSDoBit(newval bool) error {
+    var do C.uint8_t = 0
+    if newval {
+        do = 1
+    }
+    rc := C.getdns_context_set_edns_do_bit(c.ctx, do)
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+
+    return nil
+}
