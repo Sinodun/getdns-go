@@ -428,3 +428,24 @@ func TestEDNSMaximumUdpPayloadSize(t *testing.T) {
         t.Fatal("Incorrect EDNS max udp payload size: %v", edns)
     }
 }
+
+func TestEDNSVersion(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    err = c.SetEDNSVersion(123)
+    if err != nil {
+        t.Fatalf("Can't set EDNS version: %s", err)
+    }
+
+    edns, err := c.GetEDNSVersion()
+    if err != nil {
+        t.Fatalf("No EDNS version: %s", err)
+    }
+    if edns != 123 {
+        t.Fatal("Incorrect EDDNS version: %v", edns)
+    }
+}

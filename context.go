@@ -342,3 +342,22 @@ func (c *Context) SetEDNSMaximumUdpPayloadSize(newval uint16) error {
 
     return nil
 }
+
+func (c *Context) GetEDNSVersion() (uint8, error) {
+    var val C.uint8_t
+    rc := C.getdns_context_get_edns_version(c.ctx, &val)
+    if rc != RETURN_GOOD {
+        return 0, &returnCodeError{int(rc)}
+    }
+
+    return uint8(val), nil
+}
+
+func (c *Context) SetEDNSVersion(newval uint8) error {
+    rc := C.getdns_context_set_edns_version(c.ctx, C.uint8_t(newval))
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+
+    return nil
+}
