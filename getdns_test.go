@@ -258,3 +258,29 @@ func TestAppendName(t *testing.T) {
         t.Fatalf("Bad AppendName: %d", appendName)
     }
 }
+
+func TestDNSRootServers(t *testing.T) {
+    c, err := getdns.CreateContext(false)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    d := make(getdns.Dict)
+    d["address_type"] = "IPv4"
+    d["address_data"] = "213.138.101.137"
+    r := make([]getdns.Dict, 0)
+    r = append(r, d)
+    err = c.SetDNSRootServers(r)
+    if err != nil {
+        t.Fatalf("Can't set DNS root server: %s", err)
+    }
+
+    roots, err := c.GetDNSRootServers()
+    if err != nil {
+        t.Fatalf("No DNS root servers: %s", err)
+    }
+    for _, root := range roots {
+        t.Log(root.String())
+    }
+}

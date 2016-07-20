@@ -153,3 +153,35 @@ func (c *Context) SetAppendName(appendName int) error {
     }
     return nil
 }
+
+func (c *Context) GetDNSRootServers() ([]Dict, error) {
+    var list *C.getdns_list
+    rc := C.getdns_context_get_dns_root_servers(c.ctx, &list)
+    if rc != RETURN_GOOD {
+        return nil, &returnCodeError{int(rc)}
+    }
+
+    return makeAddressDictList(list)
+}
+
+func (c *Context) SetDNSRootServers(servers []Dict) error {
+    callList := make(List, 0, len(servers))
+    for _, server := range servers {
+        callServer, err := convertAddressDictToCallTypes(server)
+        if err != nil {
+            return err
+        }
+        callList = append(callList, callServer)
+    }
+
+    clist, err := convertListToC(&callList)
+    if err != nil {
+        return err
+    }
+    defer C.getdns_list_destroy(clist)
+    rc := C.getdns_context_set_dns_root_servers(c.ctx, clist)
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+    return nil
+}
