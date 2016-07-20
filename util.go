@@ -490,6 +490,9 @@ func val2str(item interface{}, key *string) string {
     switch val := item.(type) {
     case int:
         return fmt.Sprintf("%d", val)
+    case string:
+        return "'" + val + "'"
+
     case []byte:
         if key != nil && *key == "address_data" {
             var ip net.IP = val
@@ -509,10 +512,13 @@ func val2str(item interface{}, key *string) string {
             return "'" + s + "'"
         }
         return fmt.Sprintf("'% x'", string(val))
+
     case List:
         return val.String()
+
     case Dict:
         return val.String()
+
     default:
         return "<Unknown>"
     }
