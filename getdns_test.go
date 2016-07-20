@@ -344,3 +344,24 @@ func TestDNSSECTrustAnchors(t *testing.T) {
         t.Fatalf("Can't set trust anchors: %s", err)
     }
 }
+
+func TestEDNSClientSubnetPrivate(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    err = c.SetEDNSClientSubnetPrivate(true)
+    if err != nil {
+        t.Fatalf("Can't set EDNS subnet: %s", err)
+    }
+
+    edns, err := c.GetEDNSClientSubnetPrivate()
+    if err != nil {
+        t.Fatalf("No EDNS subnet: %s", err)
+    }
+    if !edns {
+        t.Fatal("Incorrect EDBS: %d", edns)
+    }
+}

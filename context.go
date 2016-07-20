@@ -258,3 +258,26 @@ func (c *Context) SetDNSSECTrustAnchors(anchors List) error {
 
     return nil
 }
+
+func (c *Context) GetEDNSClientSubnetPrivate() (bool, error) {
+    var val C.uint8_t
+    rc := C.getdns_context_get_edns_client_subnet_private(c.ctx, &val)
+    if rc != RETURN_GOOD {
+        return false, &returnCodeError{int(rc)}
+    }
+
+    return (val == 1), nil
+}
+
+func (c *Context) SetEDNSClientSubnetPrivate(private bool) error {
+    var cskew C.uint8_t = 0
+    if private {
+        cskew = 1
+    }
+    rc := C.getdns_context_set_edns_client_subnet_private(c.ctx, cskew)
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+
+    return nil
+}
