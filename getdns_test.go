@@ -72,6 +72,8 @@ func TestAddress(t *testing.T) {
     rt, err := res.RepliesTree()
     if err != nil {
         t.Errorf("No RepliesTree: %s", err)
+    } else if len(rt) == 0 {
+        t.Error("RepliesTree empty")
     } else {
         d, ok := rt[0].(getdns.Dict)
         if !ok {
@@ -134,6 +136,8 @@ func TestGeneral(t *testing.T) {
     rt, err := res.RepliesTree()
     if err != nil {
         t.Errorf("No RepliesTree: %s", err)
+    } else if len(rt) == 0 {
+        t.Error("RepliesTree empty")
     } else {
         d, ok := rt[0].(getdns.Dict)
         if !ok {
@@ -171,6 +175,8 @@ func TestService(t *testing.T) {
     rt, err := res.RepliesTree()
     if err != nil {
         t.Errorf("No RepliesTree: %s", err)
+    } else if len(rt) == 0 {
+        t.Error("RepliesTree empty")
     } else {
         d, ok := rt[0].(getdns.Dict)
         if !ok {
@@ -210,6 +216,8 @@ func TestHostname(t *testing.T) {
     rt, err := res.RepliesTree()
     if err != nil {
         t.Errorf("No RepliesTree: %s", err)
+    } else if len(rt) == 0 {
+        t.Error("RepliesTree empty")
     } else {
         d, ok := rt[0].(getdns.Dict)
         if !ok {
