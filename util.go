@@ -483,7 +483,7 @@ func val2str(item interface{}, key *string) string {
         }
         if key != nil && *key == "address_data" {
             var ip net.IP = val
-            return ip.String()
+            return "'" + ip.String() + "'"
         }
         return fmt.Sprintf("'% x'", string(val))
     case List:
