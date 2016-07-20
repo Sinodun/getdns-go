@@ -407,3 +407,24 @@ func TestEDNSExtendedRcode(t *testing.T) {
         t.Fatal("Incorrect EDBS: %v", edns)
     }
 }
+
+func TestEDNSMaximumUdpPayloadSize(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    err = c.SetEDNSMaximumUdpPayloadSize(520)
+    if err != nil {
+        t.Fatalf("Can't set EDNS Do: %s", err)
+    }
+
+    edns, err := c.GetEDNSMaximumUdpPayloadSize()
+    if err != nil {
+        t.Fatalf("No EDNS Do: %s", err)
+    }
+    if edns != 520 {
+        t.Fatal("Incorrect EDNS max udp payload size: %v", edns)
+    }
+}

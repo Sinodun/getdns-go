@@ -323,3 +323,22 @@ func (c *Context) SetEDNSExtendedRcode(newval uint8) error {
 
     return nil
 }
+
+func (c *Context) GetEDNSMaximumUdpPayloadSize() (uint16, error) {
+    var val C.uint16_t
+    rc := C.getdns_context_get_edns_maximum_udp_payload_size(c.ctx, &val)
+    if rc != RETURN_GOOD {
+        return 0, &returnCodeError{int(rc)}
+    }
+
+    return uint16(val), nil
+}
+
+func (c *Context) SetEDNSMaximumUdpPayloadSize(newval uint16) error {
+    rc := C.getdns_context_set_edns_maximum_udp_payload_size(c.ctx, C.uint16_t(newval))
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+
+    return nil
+}
