@@ -5,7 +5,6 @@ package getdns
 import "C"
 
 import (
-    "net"
     "runtime"
     "unsafe"
 )
@@ -69,7 +68,7 @@ func (r *Result) CanonicalName() (string, error) {
     }
 }
 
-func (r *Result) JustAddressAnswers() ([]map[string]string, error) {
+func (r *Result) JustAddressAnswers() ([]Dict, error) {
     var list *C.getdns_list
 
     rc := C.getdns_dict_get_list(r.res, cJUST_ADDRESS_ANSWERS, &list)
@@ -82,24 +81,16 @@ func (r *Result) JustAddressAnswers() ([]map[string]string, error) {
         return nil, err
     }
 
-    res := make([]map[string]string, 0, len(l))
+    res := make([]Dict, 0, len(l))
     for _, addrs := range l {
-        item := make(map[string]string)
         d, ok := addrs.(Dict)
         if !ok {
             return nil, &returnCodeError{RETURN_GENERIC_ERROR}
         }
-        addrType, ok := d["address_type"].([]byte)
-        if !ok {
-            return nil, &returnCodeError{RETURN_GENERIC_ERROR}
+        item, err := convertAddressDictToUserTypes(d)
+        if err != nil {
+            return nil, err
         }
-        item["address_type"] = string(addrType)
-        var ad net.IP
-        ad, ok = d["address_data"].([]byte)
-        if !ok {
-            return nil, &returnCodeError{RETURN_GENERIC_ERROR}
-        }
-        item["address_data"] = ad.String()
         res = append(res, item)
     }
     return res, nil

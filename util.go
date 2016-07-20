@@ -290,7 +290,7 @@ func convertListToC(l *List) (*C.getdns_list, error) {
     return res, nil
 }
 
-func convertAddressDict(addr Dict) (Dict, error) {
+func convertAddressDictToCallTypes(addr Dict) (Dict, error) {
     if addr == nil {
         return nil, &returnCodeError{RETURN_INVALID_PARAMETER}
     }
@@ -370,6 +370,29 @@ func convertAddressDict(addr Dict) (Dict, error) {
             return nil, &returnCodeError{RETURN_INVALID_PARAMETER}
         }
     }
+
+    return res, nil
+}
+
+func convertAddressDictToUserTypes(addr Dict) (Dict, error) {
+    if addr == nil {
+        return nil, &returnCodeError{RETURN_INVALID_PARAMETER}
+    }
+
+    addrType, ok := addr["address_type"].([]byte)
+    if !ok || (string(addrType) != "IPv4" && string(addrType) != "IPv6") {
+        return nil, &returnCodeError{RETURN_INVALID_PARAMETER}
+    }
+
+    var addrData net.IP
+    addrData, ok = addr["address_data"].([]byte)
+    if !ok {
+        return nil, &returnCodeError{RETURN_INVALID_PARAMETER}
+    }
+
+    res := make(Dict, 1)
+    res["address_type"] = string(addrType)
+    res["address_data"] = addrData.String()
 
     return res, nil
 }

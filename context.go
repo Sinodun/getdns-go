@@ -86,7 +86,7 @@ func (c *Context) General(name string, requestType uint, exts *Dict) (*Result, e
 }
 
 func (c *Context) Hostname(address Dict, exts *Dict) (*Result, error) {
-    getdnsAddr, err := convertAddressDict(address)
+    getdnsAddr, err := convertAddressDictToCallTypes(address)
     if err != nil {
         return nil, err
     }
