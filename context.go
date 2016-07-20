@@ -185,3 +185,32 @@ func (c *Context) SetDNSRootServers(servers []Dict) error {
     }
     return nil
 }
+
+func (c *Context) GetDNSTransportList() ([]int, error) {
+    var list *C.getdns_transport_list_t
+    var listSize C.size_t
+    rc := C.getdns_context_get_dns_transport_list(c.ctx, &listSize, &list)
+    if rc != RETURN_GOOD {
+        return nil, &returnCodeError{int(rc)}
+    }
+
+    res := make([]int, int(listSize))
+    cres := (*[1 << 30]C.int)(unsafe.Pointer(list))[:listSize:listSize]
+    for i, val := range cres {
+        res[i] = int(val)
+    }
+    return res, nil
+}
+
+func (c *Context) SetDNSTransportList(list []int) error {
+    clist := make([]C.int, len(list))
+    for i, val := range list {
+        clist[i] = C.int(val)
+    }
+    rc := C.getdns_context_set_dns_transport_list(c.ctx, C.size_t(len(list)), (*C.getdns_transport_list_t)(unsafe.Pointer(&clist[0])))
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+
+    return nil
+}

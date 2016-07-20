@@ -284,3 +284,25 @@ func TestDNSRootServers(t *testing.T) {
         t.Log(root.String())
     }
 }
+
+func TestDNSTransportList(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    err = c.SetDNSTransportList([]int{getdns.TRANSPORT_UDP, getdns.TRANSPORT_TCP, getdns.TRANSPORT_TLS})
+    if err != nil {
+        t.Fatalf("Can't set transport list: %s", err)
+    }
+
+    tl, err := c.GetDNSTransportList()
+    if err != nil {
+        t.Fatalf("No transport list: %s", err)
+    }
+    if len(tl) != 3 ||
+        (tl[0] != getdns.TRANSPORT_UDP && tl[1] != getdns.TRANSPORT_TCP && tl[2] != getdns.TRANSPORT_TLS) {
+        t.Fatalf("Incorrect transport list: %s", err)
+    }
+}
