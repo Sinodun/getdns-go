@@ -215,17 +215,17 @@ func (c *Context) SetDNSTransportList(list []int) error {
     return nil
 }
 
-func (c *Context) GetDNSSECAllowedSkew() (uint, error) {
+func (c *Context) GetDNSSECAllowedSkew() (uint32, error) {
     var res C.uint32_t
     rc := C.getdns_context_get_dnssec_allowed_skew(c.ctx, &res)
     if rc != RETURN_GOOD {
         return 0, &returnCodeError{int(rc)}
     }
 
-    return uint(res), nil
+    return uint32(res), nil
 }
 
-func (c *Context) SetDNSSECAllowedSkew(skew uint) error {
+func (c *Context) SetDNSSECAllowedSkew(skew uint32) error {
     var cskew C.uint32_t = C.uint32_t(skew)
     rc := C.getdns_context_set_dnssec_allowed_skew(c.ctx, cskew)
     if rc != RETURN_GOOD {
@@ -305,17 +305,17 @@ func (c *Context) SetEDNSDoBit(newval bool) error {
     return nil
 }
 
-func (c *Context) GetEDNSExtendedRcode() (uint, error) {
+func (c *Context) GetEDNSExtendedRcode() (uint8, error) {
     var val C.uint8_t
     rc := C.getdns_context_get_edns_extended_rcode(c.ctx, &val)
     if rc != RETURN_GOOD {
         return 0, &returnCodeError{int(rc)}
     }
 
-    return uint(val), nil
+    return uint8(val), nil
 }
 
-func (c *Context) SetEDNSExtendedRcode(newval uint) error {
+func (c *Context) SetEDNSExtendedRcode(newval uint8) error {
     rc := C.getdns_context_set_edns_extended_rcode(c.ctx, C.uint8_t(newval))
     if rc != RETURN_GOOD {
         return &returnCodeError{int(rc)}
