@@ -583,3 +583,24 @@ func TestSuffix(t *testing.T) {
         t.Fatalf("Incorrect suffixes: %v", val)
     }
 }
+
+func TestTimeout(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    err = c.SetTimeout(1234)
+    if err != nil {
+        t.Fatalf("Can't set timeout: %s", err)
+    }
+
+    val, err := c.Timeout()
+    if err != nil {
+        t.Fatalf("No timeout: %s", err)
+    }
+    if val != 1234 {
+        t.Fatal("Incorrect timeout: %v", val)
+    }
+}

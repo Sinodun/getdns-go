@@ -539,6 +539,25 @@ func (c *Context) SetSuffix(list []string) error {
     return nil
 }
 
+func (c *Context) Timeout() (uint64, error) {
+    var val C.uint64_t
+    rc := C.getdns_context_get_timeout(c.ctx, &val)
+    if rc != RETURN_GOOD {
+        return 0, &returnCodeError{int(rc)}
+    }
+
+    return uint64(val), nil
+}
+
+func (c *Context) SetTimeout(newval uint64) error {
+    rc := C.getdns_context_set_timeout(c.ctx, C.uint64_t(newval))
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+
+    return nil
+}
+
 func (c *Context) ImplementationString() string {
     return c.implementationString
 }
