@@ -61,7 +61,7 @@ func (c *Context) IsValid() bool {
     return c.ctx != nil
 }
 
-func (c *Context) Address(name string, exts *Dict) (*Result, error) {
+func (c *Context) Address(name string, exts Dict) (*Result, error) {
     err := checkExtensions(exts)
     if err != nil {
         return nil, err
@@ -83,7 +83,7 @@ func (c *Context) Address(name string, exts *Dict) (*Result, error) {
     return createResult(res), nil
 }
 
-func (c *Context) General(name string, requestType uint, exts *Dict) (*Result, error) {
+func (c *Context) General(name string, requestType uint, exts Dict) (*Result, error) {
     err := checkExtensions(exts)
     if err != nil {
         return nil, err
@@ -113,7 +113,7 @@ func (c *Context) ApiInformation() (Dict, error) {
     return res, nil
 }
 
-func (c *Context) Hostname(address Dict, exts *Dict) (*Result, error) {
+func (c *Context) Hostname(address Dict, exts Dict) (*Result, error) {
     getdnsAddr, err := convertAddressDictToCallTypes(address)
     if err != nil {
         return nil, err
@@ -124,7 +124,7 @@ func (c *Context) Hostname(address Dict, exts *Dict) (*Result, error) {
     }
     var res *C.getdns_dict
     var caddr *C.getdns_dict
-    caddr, err = convertDictToC(&getdnsAddr)
+    caddr, err = convertDictToC(getdnsAddr)
     defer C.getdns_dict_destroy(caddr)
     if err != nil {
         return nil, err
@@ -143,7 +143,7 @@ func (c *Context) Hostname(address Dict, exts *Dict) (*Result, error) {
     return createResult(res), nil
 }
 
-func (c *Context) Service(name string, exts *Dict) (*Result, error) {
+func (c *Context) Service(name string, exts Dict) (*Result, error) {
     err := checkExtensions(exts)
     if err != nil {
         return nil, err
@@ -202,7 +202,7 @@ func (c *Context) SetDNSRootServers(servers []Dict) error {
         callList = append(callList, callServer)
     }
 
-    clist, err := convertListToC(&callList)
+    clist, err := convertListToC(callList)
     if err != nil {
         return err
     }
@@ -274,7 +274,7 @@ func (c *Context) DNSSECTrustAnchors() (List, error) {
 }
 
 func (c *Context) SetDNSSECTrustAnchors(anchors List) error {
-    canchors, err := convertListToC(&anchors)
+    canchors, err := convertListToC(anchors)
     if err != nil {
         return err
     }
@@ -526,7 +526,7 @@ func (c *Context) SetSuffix(list []string) error {
     for i, val := range list {
         glist[i] = val
     }
-    clist, err := convertListToC(&glist)
+    clist, err := convertListToC(glist)
     if err != nil {
         return err
     }

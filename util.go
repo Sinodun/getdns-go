@@ -187,7 +187,7 @@ func convertListToGo(list *C.getdns_list) (List, error) {
     return res, nil
 }
 
-func convertDictToC(d *Dict) (*C.getdns_dict, error) {
+func convertDictToC(d Dict) (*C.getdns_dict, error) {
     var res *C.getdns_dict
 
     if d == nil {
@@ -199,7 +199,7 @@ func convertDictToC(d *Dict) (*C.getdns_dict, error) {
         return nil, &returnCodeError{RETURN_MEMORY_ERROR}
     }
 
-    for key, item := range *d {
+    for key, item := range d {
         ckey := C.CString(key)
         defer C.free(unsafe.Pointer(ckey))
 
@@ -216,7 +216,7 @@ func convertDictToC(d *Dict) (*C.getdns_dict, error) {
             rc = C.dict_set_bindata(res, ckey, (*C.uint8_t)(unsafe.Pointer(&val[0])), C.size_t(len(val)))
 
         case Dict:
-            d, err := convertDictToC(&val)
+            d, err := convertDictToC(val)
             if err != nil {
                 C.getdns_dict_destroy(res)
                 return nil, err
@@ -224,7 +224,7 @@ func convertDictToC(d *Dict) (*C.getdns_dict, error) {
             rc = C.getdns_dict_set_dict(res, ckey, d)
 
         case List:
-            l, err := convertListToC(&val)
+            l, err := convertListToC(val)
             if err != nil {
                 C.getdns_dict_destroy(res)
                 return nil, err
@@ -244,7 +244,7 @@ func convertDictToC(d *Dict) (*C.getdns_dict, error) {
     return res, nil
 }
 
-func convertListToC(l *List) (*C.getdns_list, error) {
+func convertListToC(l List) (*C.getdns_list, error) {
     var res *C.getdns_list
 
     if l == nil {
@@ -256,7 +256,7 @@ func convertListToC(l *List) (*C.getdns_list, error) {
         return nil, &returnCodeError{RETURN_MEMORY_ERROR}
     }
 
-    for i, item := range *l {
+    for i, item := range l {
         var rc C.getdns_return_t
         switch val := item.(type) {
         case int:
@@ -270,7 +270,7 @@ func convertListToC(l *List) (*C.getdns_list, error) {
             rc = C.list_set_bindata(res, C.size_t(i), (*C.uint8_t)(unsafe.Pointer(&val[0])), C.size_t(len(val)))
 
         case Dict:
-            d, err := convertDictToC(&val)
+            d, err := convertDictToC(val)
             if err != nil {
                 C.getdns_list_destroy(res)
                 return nil, err
@@ -278,7 +278,7 @@ func convertListToC(l *List) (*C.getdns_list, error) {
             rc = C.getdns_list_set_dict(res, C.size_t(i), d)
 
         case List:
-            l, err := convertListToC(&val)
+            l, err := convertListToC(val)
             if err != nil {
                 C.getdns_list_destroy(res)
                 return nil, err
@@ -426,7 +426,7 @@ func makeAddressDictList(list *C.getdns_list) ([]Dict, error) {
     return res, nil
 }
 
-func checkExtensions(exts *Dict) error {
+func checkExtensions(exts Dict) error {
     if exts == nil {
         return nil
     }
@@ -438,7 +438,7 @@ func checkExtensions(exts *Dict) error {
     } else {
         retcall = "return_call_reporting"
     }
-    for key, item := range *exts {
+    for key, item := range exts {
         switch key {
         case retcall,
             "add_warning_for_bad_dns",

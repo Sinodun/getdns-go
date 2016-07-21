@@ -133,7 +133,7 @@ func TestGeneral(t *testing.T) {
 
     exts := make(getdns.Dict, 1)
     exts["return_both_v4_and_v6"] = getdns.EXTENSION_TRUE
-    res, err := c.General("lunch.org.uk", getdns.RRTYPE_MX, &exts)
+    res, err := c.General("lunch.org.uk", getdns.RRTYPE_MX, exts)
     if res == nil {
         t.Fatalf("No Result created: %s", err)
     }
@@ -172,7 +172,7 @@ func TestService(t *testing.T) {
 
     exts := make(getdns.Dict, 1)
     exts["return_both_v4_and_v6"] = getdns.EXTENSION_TRUE
-    res, err := c.Service("_imap._tcp.gmail.com", &exts)
+    res, err := c.Service("_imap._tcp.gmail.com", exts)
     if res == nil {
         t.Fatalf("No Result created: %s", err)
     }
