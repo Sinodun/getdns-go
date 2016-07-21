@@ -10,7 +10,9 @@ import (
 )
 
 type Context struct {
-    ctx *C.getdns_context
+    ctx                  *C.getdns_context
+    implementationString string
+    versionString        string
 }
 
 func CreateContext(setFromOS bool) (*Context, error) {
@@ -26,6 +28,24 @@ func CreateContext(setFromOS bool) (*Context, error) {
 
     res := &Context{ctx: ctx}
     runtime.SetFinalizer(res, (*Context).Destroy)
+
+    apiInfo, err := res.GetApiInformation()
+    if err != nil {
+        res.Destroy()
+        return nil, err
+    }
+    var is, vs []byte
+    is, ok := apiInfo["implementation_string"].([]byte)
+    if ok {
+        vs, ok = apiInfo["version_string"].([]byte)
+    }
+    if !ok {
+        res.Destroy()
+        return nil, &returnCodeError{RETURN_NO_SUCH_DICT_NAME}
+    }
+    res.implementationString = string(is)
+    res.versionString = string(vs)
+
     return res, nil
 }
 
@@ -406,4 +426,12 @@ func (c *Context) SetIdleTimeout(newval uint64) error {
     }
 
     return nil
+}
+
+func (c *Context) ImplementationString() string {
+    return c.implementationString
+}
+
+func (c *Context) VersionString() string {
+    return c.versionString
 }

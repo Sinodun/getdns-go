@@ -18,6 +18,11 @@ func TestContextCreate(t *testing.T) {
         return
     }
 
+    is := c.ImplementationString()
+    if is != "https://getdnsapi.net" {
+        t.Errorf("Unexpected implementation string: %v", is)
+    }
+
     c.Destroy()
     if c.IsValid() {
         t.Error("Context not destroyed")
