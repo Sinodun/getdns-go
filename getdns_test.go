@@ -503,6 +503,27 @@ func TestIdleTimeout(t *testing.T) {
     }
 }
 
+func TestLimitOutstandingQueries(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    err = c.SetLimitOutstandingQueries(1234)
+    if err != nil {
+        t.Fatalf("Can't set outstanding queries limit: %s", err)
+    }
+
+    val, err := c.LimitOutstandingQueries()
+    if err != nil {
+        t.Fatalf("No outstanding queries limit: %s", err)
+    }
+    if val != 1234 {
+        t.Fatal("Incorrect outstanding queries limit: %v", val)
+    }
+}
+
 func TestApiInformation(t *testing.T) {
     c, err := getdns.CreateContext(true)
     if c == nil {
