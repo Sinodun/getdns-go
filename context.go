@@ -493,6 +493,52 @@ func (c *Context) SetResolutionType(newval int) error {
     return nil
 }
 
+func (c *Context) Suffix() ([]string, error) {
+    var list *C.getdns_list
+    rc := C.getdns_context_get_suffix(c.ctx, &list)
+    if rc != RETURN_GOOD {
+        return nil, &returnCodeError{int(rc)}
+    }
+
+    glist, err := convertListToGo(list)
+    if err != nil {
+        return nil, err
+    }
+
+    res := make([]string, len(glist))
+    for i, val := range glist {
+        b, ok := val.([]byte)
+        if !ok {
+            return nil, &returnCodeError{RETURN_GENERIC_ERROR}
+        }
+        // In 0.9.0 this returns a zero byte as the last byte.
+        if b[len(b)-1] == 0 {
+            b = b[0 : len(b)-1]
+        }
+        res[i] = string(b)
+    }
+
+    return res, nil
+}
+
+func (c *Context) SetSuffix(list []string) error {
+    glist := make(List, len(list))
+    for i, val := range list {
+        glist[i] = val
+    }
+    clist, err := convertListToC(&glist)
+    if err != nil {
+        return err
+    }
+    defer C.getdns_list_destroy(clist)
+    rc := C.getdns_context_set_suffix(c.ctx, clist)
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+
+    return nil
+}
+
 func (c *Context) ImplementationString() string {
     return c.implementationString
 }

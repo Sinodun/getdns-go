@@ -562,3 +562,24 @@ func TestResolutionType(t *testing.T) {
         t.Fatalf("Bad ResolutionType: %d", rt)
     }
 }
+
+func TestSuffix(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    err = c.SetSuffix([]string{"hello.net", "world.net"})
+    if err != nil {
+        t.Fatalf("SetSuffix() failed: %s", err)
+    }
+    val, err := c.Suffix()
+    if err != nil {
+        t.Fatalf("Suffix() failed: %s", err)
+    }
+
+    if len(val) != 2 || val[0] != "hello.net." || val[1] != "world.net." {
+        t.Fatalf("Incorrect suffixes: %v", val)
+    }
+}
