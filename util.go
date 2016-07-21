@@ -208,6 +208,10 @@ func convertDictToC(d *Dict) (*C.getdns_dict, error) {
         case int:
             rc = C.getdns_dict_set_int(res, ckey, C.uint32_t(val))
 
+        case string:
+            b := []byte(val)
+            rc = C.dict_set_bindata(res, ckey, (*C.uint8_t)(unsafe.Pointer(&b[0])), C.size_t(len(b)))
+
         case []byte:
             rc = C.dict_set_bindata(res, ckey, (*C.uint8_t)(unsafe.Pointer(&val[0])), C.size_t(len(val)))
 
@@ -257,6 +261,10 @@ func convertListToC(l *List) (*C.getdns_list, error) {
         switch val := item.(type) {
         case int:
             rc = C.getdns_list_set_int(res, C.size_t(i), C.uint32_t(val))
+
+        case string:
+            b := []byte(val)
+            rc = C.list_set_bindata(res, C.size_t(i), (*C.uint8_t)(unsafe.Pointer(&b[0])), C.size_t(len(b)))
 
         case []byte:
             rc = C.list_set_bindata(res, C.size_t(i), (*C.uint8_t)(unsafe.Pointer(&val[0])), C.size_t(len(val)))
