@@ -402,6 +402,12 @@ func convertAddressDictToUserTypes(addr Dict) (Dict, error) {
     res["address_type"] = string(addrType)
     res["address_data"] = addrData.String()
 
+    for key, item := range addr {
+        if key != "address_type" && key != "address_data" {
+            res[key] = item
+        }
+    }
+
     return res, nil
 }
 
