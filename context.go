@@ -577,6 +577,25 @@ func (c *Context) SetTLSAuthentication(newval int) error {
     return nil
 }
 
+func (c *Context) TLSQueryPaddingBlocksize() (uint16, error) {
+    var val C.uint16_t
+    rc := C.getdns_context_get_tls_query_padding_blocksize(c.ctx, &val)
+    if rc != RETURN_GOOD {
+        return 0, &returnCodeError{int(rc)}
+    }
+
+    return uint16(val), nil
+}
+
+func (c *Context) SetTLSQueryPaddingBlocksize(newval uint16) error {
+    rc := C.getdns_context_set_tls_query_padding_blocksize(c.ctx, C.uint16_t(newval))
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+
+    return nil
+}
+
 func (c *Context) ImplementationString() string {
     return c.implementationString
 }

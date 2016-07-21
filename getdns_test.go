@@ -652,3 +652,24 @@ func TestTLSAuthentication(t *testing.T) {
         }
     }
 }
+
+func TestTLSQueryPaddingBlocksize(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    err = c.SetTLSQueryPaddingBlocksize(520)
+    if err != nil {
+        t.Fatalf("Can't set TLS query padding blocksize: %s", err)
+    }
+
+    edns, err := c.TLSQueryPaddingBlocksize()
+    if err != nil {
+        t.Fatalf("No TLS Query Padding Blocksize: %s", err)
+    }
+    if edns != 520 {
+        t.Fatal("Incorrect TLS Query Padding Blocksize: %v", edns)
+    }
+}
