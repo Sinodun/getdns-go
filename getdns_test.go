@@ -542,3 +542,24 @@ func TestNamespaces(t *testing.T) {
         t.Fatal("Incorrect namespaces")
     }
 }
+
+func TestResolutionType(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    err = c.SetResolutionType(getdns.RESOLUTION_RECURSING)
+    if err != nil {
+        t.Fatalf("SetResolutionType() failed: %s", err)
+    }
+
+    rt, err := c.ResolutionType()
+    if err != nil {
+        t.Fatalf("No ResolutionType: %s", err)
+    }
+    if rt != getdns.RESOLUTION_RECURSING {
+        t.Fatalf("Bad ResolutionType: %d", rt)
+    }
+}

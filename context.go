@@ -476,6 +476,23 @@ func (c *Context) SetNamespaces(list []int) error {
     return nil
 }
 
+func (c *Context) ResolutionType() (int, error) {
+    var res C.getdns_resolution_t
+    rc := C.getdns_context_get_resolution_type(c.ctx, &res)
+    if rc != RETURN_GOOD {
+        return 0, &returnCodeError{int(rc)}
+    }
+    return int(res), nil
+}
+
+func (c *Context) SetResolutionType(newval int) error {
+    rc := C.getdns_context_set_resolution_type(c.ctx, C.getdns_resolution_t(newval))
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+    return nil
+}
+
 func (c *Context) ImplementationString() string {
     return c.implementationString
 }
