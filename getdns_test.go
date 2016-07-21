@@ -255,7 +255,7 @@ func TestAppendName(t *testing.T) {
         t.Fatalf("SetAppendName() failed: %s", err)
     }
 
-    appendName, err := c.GetAppendName()
+    appendName, err := c.AppendName()
     if err != nil {
         t.Fatalf("No AppendName: %s", err)
     }
@@ -281,7 +281,7 @@ func TestDNSRootServers(t *testing.T) {
         t.Fatalf("Can't set DNS root server: %s", err)
     }
 
-    roots, err := c.GetDNSRootServers()
+    roots, err := c.DNSRootServers()
     if err != nil {
         t.Fatalf("No DNS root servers: %s", err)
     }
@@ -302,7 +302,7 @@ func TestDNSTransportList(t *testing.T) {
         t.Fatalf("Can't set transport list: %s", err)
     }
 
-    tl, err := c.GetDNSTransportList()
+    tl, err := c.DNSTransportList()
     if err != nil {
         t.Fatalf("No transport list: %s", err)
     }
@@ -324,7 +324,7 @@ func TestDNSSECAllowedSkew(t *testing.T) {
         t.Fatalf("Can't set allowed skew: %s", err)
     }
 
-    skew, err := c.GetDNSSECAllowedSkew()
+    skew, err := c.DNSSECAllowedSkew()
     if err != nil {
         t.Fatalf("No allowed skew: %s", err)
     }
@@ -340,7 +340,7 @@ func TestDNSSECTrustAnchors(t *testing.T) {
     }
     defer c.Destroy()
 
-    anchors, err := c.GetDNSSECTrustAnchors()
+    anchors, err := c.DNSSECTrustAnchors()
     if err != nil {
         t.Fatalf("No trust anchors: %s", err)
     }
@@ -362,7 +362,7 @@ func TestEDNSClientSubnetPrivate(t *testing.T) {
         t.Fatalf("Can't set EDNS subnet: %s", err)
     }
 
-    edns, err := c.GetEDNSClientSubnetPrivate()
+    edns, err := c.EDNSClientSubnetPrivate()
     if err != nil {
         t.Fatalf("No EDNS subnet: %s", err)
     }
@@ -383,7 +383,7 @@ func TestEDNSDoBit(t *testing.T) {
         t.Fatalf("Can't set EDNS Do: %s", err)
     }
 
-    edns, err := c.GetEDNSDoBit()
+    edns, err := c.EDNSDoBit()
     if err != nil {
         t.Fatalf("No EDNS Do: %s", err)
     }
@@ -404,7 +404,7 @@ func TestEDNSExtendedRcode(t *testing.T) {
         t.Fatalf("Can't set EDNS Do: %s", err)
     }
 
-    edns, err := c.GetEDNSExtendedRcode()
+    edns, err := c.EDNSExtendedRcode()
     if err != nil {
         t.Fatalf("No EDNS Do: %s", err)
     }
@@ -425,7 +425,7 @@ func TestEDNSMaximumUdpPayloadSize(t *testing.T) {
         t.Fatalf("Can't set EDNS Do: %s", err)
     }
 
-    edns, err := c.GetEDNSMaximumUdpPayloadSize()
+    edns, err := c.EDNSMaximumUdpPayloadSize()
     if err != nil {
         t.Fatalf("No EDNS Do: %s", err)
     }
@@ -446,7 +446,7 @@ func TestEDNSVersion(t *testing.T) {
         t.Fatalf("Can't set EDNS version: %s", err)
     }
 
-    edns, err := c.GetEDNSVersion()
+    edns, err := c.EDNSVersion()
     if err != nil {
         t.Fatalf("No EDNS version: %s", err)
     }
@@ -472,7 +472,7 @@ func TestFollowRedirects(t *testing.T) {
             }
         }
     } else {
-        val, err := c.GetFollowRedirects()
+        val, err := c.FollowRedirects()
         if err != nil {
             t.Fatalf("Can't get follow redirects: %s", err)
         }
@@ -494,7 +494,7 @@ func TestIdleTimeout(t *testing.T) {
         t.Fatalf("Can't set idle timeout: %s", err)
     }
 
-    val, err := c.GetIdleTimeout()
+    val, err := c.IdleTimeout()
     if err != nil {
         t.Fatalf("No idle timeout: %s", err)
     }
@@ -503,14 +503,14 @@ func TestIdleTimeout(t *testing.T) {
     }
 }
 
-func TestGetApiInformation(t *testing.T) {
+func TestApiInformation(t *testing.T) {
     c, err := getdns.CreateContext(true)
     if c == nil {
         t.Fatalf("No Context created: %s", err)
     }
     defer c.Destroy()
 
-    info, err := c.GetApiInformation()
+    info, err := c.ApiInformation()
     if err != nil {
         t.Fatalf("Can't get api info: %s", err)
     }

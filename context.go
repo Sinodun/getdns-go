@@ -29,7 +29,7 @@ func CreateContext(setFromOS bool) (*Context, error) {
     res := &Context{ctx: ctx}
     runtime.SetFinalizer(res, (*Context).Destroy)
 
-    apiInfo, err := res.GetApiInformation()
+    apiInfo, err := res.ApiInformation()
     if err != nil {
         res.Destroy()
         return nil, err
@@ -105,7 +105,7 @@ func (c *Context) General(name string, requestType uint, exts *Dict) (*Result, e
     return createResult(res), nil
 }
 
-func (c *Context) GetApiInformation() (Dict, error) {
+func (c *Context) ApiInformation() (Dict, error) {
     res, err := convertDictToGo(C.getdns_context_get_api_information(c.ctx))
     if err != nil {
         return nil, err
@@ -165,7 +165,7 @@ func (c *Context) Service(name string, exts *Dict) (*Result, error) {
     return createResult(res), nil
 }
 
-func (c *Context) GetAppendName() (int, error) {
+func (c *Context) AppendName() (int, error) {
     var res C.getdns_append_name_t
     rc := C.getdns_context_get_append_name(c.ctx, &res)
     if rc != RETURN_GOOD {
@@ -182,7 +182,7 @@ func (c *Context) SetAppendName(appendName int) error {
     return nil
 }
 
-func (c *Context) GetDNSRootServers() ([]Dict, error) {
+func (c *Context) DNSRootServers() ([]Dict, error) {
     var list *C.getdns_list
     rc := C.getdns_context_get_dns_root_servers(c.ctx, &list)
     if rc != RETURN_GOOD {
@@ -214,7 +214,7 @@ func (c *Context) SetDNSRootServers(servers []Dict) error {
     return nil
 }
 
-func (c *Context) GetDNSTransportList() ([]int, error) {
+func (c *Context) DNSTransportList() ([]int, error) {
     var list *C.getdns_transport_list_t
     var listSize C.size_t
     rc := C.getdns_context_get_dns_transport_list(c.ctx, &listSize, &list)
@@ -243,7 +243,7 @@ func (c *Context) SetDNSTransportList(list []int) error {
     return nil
 }
 
-func (c *Context) GetDNSSECAllowedSkew() (uint32, error) {
+func (c *Context) DNSSECAllowedSkew() (uint32, error) {
     var res C.uint32_t
     rc := C.getdns_context_get_dnssec_allowed_skew(c.ctx, &res)
     if rc != RETURN_GOOD {
@@ -263,7 +263,7 @@ func (c *Context) SetDNSSECAllowedSkew(skew uint32) error {
     return nil
 }
 
-func (c *Context) GetDNSSECTrustAnchors() (List, error) {
+func (c *Context) DNSSECTrustAnchors() (List, error) {
     var list *C.getdns_list
     rc := C.getdns_context_get_dnssec_trust_anchors(c.ctx, &list)
     if rc != RETURN_GOOD {
@@ -287,7 +287,7 @@ func (c *Context) SetDNSSECTrustAnchors(anchors List) error {
     return nil
 }
 
-func (c *Context) GetEDNSClientSubnetPrivate() (bool, error) {
+func (c *Context) EDNSClientSubnetPrivate() (bool, error) {
     var val C.uint8_t
     rc := C.getdns_context_get_edns_client_subnet_private(c.ctx, &val)
     if rc != RETURN_GOOD {
@@ -310,7 +310,7 @@ func (c *Context) SetEDNSClientSubnetPrivate(private bool) error {
     return nil
 }
 
-func (c *Context) GetEDNSDoBit() (bool, error) {
+func (c *Context) EDNSDoBit() (bool, error) {
     var val C.uint8_t
     rc := C.getdns_context_get_edns_do_bit(c.ctx, &val)
     if rc != RETURN_GOOD {
@@ -333,7 +333,7 @@ func (c *Context) SetEDNSDoBit(newval bool) error {
     return nil
 }
 
-func (c *Context) GetEDNSExtendedRcode() (uint8, error) {
+func (c *Context) EDNSExtendedRcode() (uint8, error) {
     var val C.uint8_t
     rc := C.getdns_context_get_edns_extended_rcode(c.ctx, &val)
     if rc != RETURN_GOOD {
@@ -352,7 +352,7 @@ func (c *Context) SetEDNSExtendedRcode(newval uint8) error {
     return nil
 }
 
-func (c *Context) GetEDNSMaximumUdpPayloadSize() (uint16, error) {
+func (c *Context) EDNSMaximumUdpPayloadSize() (uint16, error) {
     var val C.uint16_t
     rc := C.getdns_context_get_edns_maximum_udp_payload_size(c.ctx, &val)
     if rc != RETURN_GOOD {
@@ -371,7 +371,7 @@ func (c *Context) SetEDNSMaximumUdpPayloadSize(newval uint16) error {
     return nil
 }
 
-func (c *Context) GetEDNSVersion() (uint8, error) {
+func (c *Context) EDNSVersion() (uint8, error) {
     var val C.uint8_t
     rc := C.getdns_context_get_edns_version(c.ctx, &val)
     if rc != RETURN_GOOD {
@@ -390,7 +390,7 @@ func (c *Context) SetEDNSVersion(newval uint8) error {
     return nil
 }
 
-func (c *Context) GetFollowRedirects() (int, error) {
+func (c *Context) FollowRedirects() (int, error) {
     var val C.getdns_redirects_t
     rc := C.getdns_context_get_follow_redirects(c.ctx, &val)
     if rc != RETURN_GOOD {
@@ -409,7 +409,7 @@ func (c *Context) SetFollowRedirects(newval int) error {
     return nil
 }
 
-func (c *Context) GetIdleTimeout() (uint64, error) {
+func (c *Context) IdleTimeout() (uint64, error) {
     var val C.uint64_t
     rc := C.getdns_context_get_idle_timeout(c.ctx, &val)
     if rc != RETURN_GOOD {
