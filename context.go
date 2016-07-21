@@ -85,6 +85,14 @@ func (c *Context) General(name string, requestType uint, exts *Dict) (*Result, e
     return createResult(res), nil
 }
 
+func (c *Context) GetApiInformation() (Dict, error) {
+    res, err := convertDictToGo(C.getdns_context_get_api_information(c.ctx))
+    if err != nil {
+        return nil, err
+    }
+    return res, nil
+}
+
 func (c *Context) Hostname(address Dict, exts *Dict) (*Result, error) {
     getdnsAddr, err := convertAddressDictToCallTypes(address)
     if err != nil {

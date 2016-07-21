@@ -497,3 +497,21 @@ func TestIdleTimeout(t *testing.T) {
         t.Fatal("Incorrect idle timeout: %v", val)
     }
 }
+
+func TestGetApiInformation(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    info, err := c.GetApiInformation()
+    if err != nil {
+        t.Fatalf("Can't get api info: %s", err)
+    }
+
+    _, ok := info["all_context"]
+    if !ok {
+        t.Fatal("No api info context")
+    }
+}
