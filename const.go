@@ -1,6 +1,6 @@
 package getdns
 
-// #include <getdns/getdns.h>
+// #include <getdns/getdns_extra.h>
 import "C"
 
 // Result codes.returned by getdns.
@@ -169,4 +169,10 @@ const (
 const (
     RESOLUTION_STUB      = C.GETDNS_RESOLUTION_STUB
     RESOLUTION_RECURSING = C.GETDNS_RESOLUTION_RECURSING
+)
+
+// Context authentication options when using TLS.
+const (
+    AUTHENTICATION_NONE     = C.GETDNS_AUTHENTICATION_NONE
+    AUTHENTICATION_REQUIRED = C.GETDNS_AUTHENTICATION_REQUIRED
 )

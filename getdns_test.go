@@ -604,3 +604,30 @@ func TestTimeout(t *testing.T) {
         t.Fatal("Incorrect timeout: %v", val)
     }
 }
+
+func TestTLSAuthentication(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    // Not implemented on 0.9.0.
+    err = c.SetTLSAuthentication(getdns.AUTHENTICATION_REQUIRED)
+    if err != nil {
+        gderr, ok := err.(getdns.Error)
+        if ok {
+            if gderr.ReturnCode() != getdns.RETURN_NOT_IMPLEMENTED {
+                t.Fatalf("Unexpected TLSAuthentication error: %v", gderr.ReturnCode())
+            }
+        }
+    } else {
+        val, err := c.TLSAuthentication()
+        if err != nil {
+            t.Fatalf("Can't get TLS authentication: %s", err)
+        }
+        if val != getdns.AUTHENTICATION_REQUIRED {
+            t.Fatalf("Unexpected TLS authentication: %v", val)
+        }
+    }
+}
