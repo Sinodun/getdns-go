@@ -306,8 +306,8 @@ func TestDNSTransportList(t *testing.T) {
     if err != nil {
         t.Fatalf("No transport list: %s", err)
     }
-    if len(tl) != 3 ||
-        (tl[0] != getdns.TRANSPORT_UDP && tl[1] != getdns.TRANSPORT_TCP && tl[2] != getdns.TRANSPORT_TLS) {
+    if len(tl) != 3 || tl[0] != getdns.TRANSPORT_UDP ||
+        tl[1] != getdns.TRANSPORT_TCP || tl[2] != getdns.TRANSPORT_TLS {
         t.Fatal("Incorrect transport list")
     }
 }
@@ -537,8 +537,7 @@ func TestNamespaces(t *testing.T) {
     if err != nil {
         t.Fatalf("No namespaces: %s", err)
     }
-    if len(tl) != 2 ||
-        (tl[0] != getdns.NAMESPACE_DNS && tl[1] != getdns.NAMESPACE_LOCALNAMES) {
+    if len(tl) != 2 || tl[0] != getdns.NAMESPACE_DNS || tl[1] != getdns.NAMESPACE_LOCALNAMES {
         t.Fatal("Incorrect namespaces")
     }
 }
