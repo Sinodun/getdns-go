@@ -520,3 +520,25 @@ func TestApiInformation(t *testing.T) {
         t.Fatal("No api info context")
     }
 }
+
+func TestNamespaces(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    err = c.SetNamespaces([]int{getdns.NAMESPACE_DNS, getdns.NAMESPACE_LOCALNAMES})
+    if err != nil {
+        t.Fatalf("Can't set namespaces: %s", err)
+    }
+
+    tl, err := c.Namespaces()
+    if err != nil {
+        t.Fatalf("No namespaces: %s", err)
+    }
+    if len(tl) != 2 ||
+        (tl[0] != getdns.NAMESPACE_DNS && tl[1] != getdns.NAMESPACE_LOCALNAMES) {
+        t.Fatal("Incorrect namespaces")
+    }
+}

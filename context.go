@@ -428,6 +428,54 @@ func (c *Context) SetIdleTimeout(newval uint64) error {
     return nil
 }
 
+func (c *Context) LimitOutstandingQueries() (uint16, error) {
+    var val C.uint16_t
+    rc := C.getdns_context_get_limit_outstanding_queries(c.ctx, &val)
+    if rc != RETURN_GOOD {
+        return 0, &returnCodeError{int(rc)}
+    }
+
+    return uint16(val), nil
+}
+
+func (c *Context) SetLimitOutstandingQueries(newval uint16) error {
+    rc := C.getdns_context_set_limit_outstanding_queries(c.ctx, C.uint16_t(newval))
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+
+    return nil
+}
+
+func (c *Context) Namespaces() ([]int, error) {
+    var list *C.getdns_namespace_t
+    var listSize C.size_t
+    rc := C.getdns_context_get_namespaces(c.ctx, &listSize, &list)
+    if rc != RETURN_GOOD {
+        return nil, &returnCodeError{int(rc)}
+    }
+
+    res := make([]int, int(listSize))
+    cres := (*[1 << 30]C.int)(unsafe.Pointer(list))[:listSize:listSize]
+    for i, val := range cres {
+        res[i] = int(val)
+    }
+    return res, nil
+}
+
+func (c *Context) SetNamespaces(list []int) error {
+    clist := make([]C.int, len(list))
+    for i, val := range list {
+        clist[i] = C.int(val)
+    }
+    rc := C.getdns_context_set_namespaces(c.ctx, C.size_t(len(list)), (*C.getdns_namespace_t)(unsafe.Pointer(&clist[0])))
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+
+    return nil
+}
+
 func (c *Context) ImplementationString() string {
     return c.implementationString
 }
