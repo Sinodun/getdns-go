@@ -596,6 +596,59 @@ func (c *Context) SetTLSQueryPaddingBlocksize(newval uint16) error {
     return nil
 }
 
+func (c *Context) UpstreamRecursiveServers() (List, error) {
+    var list *C.getdns_list
+    rc := C.getdns_context_get_upstream_recursive_servers(c.ctx, &list)
+    if rc != RETURN_GOOD {
+        return nil, &returnCodeError{int(rc)}
+    }
+
+    callres, err := convertListToGo(list)
+    if err != nil {
+        return nil, err
+    }
+
+    res := make(List, len(callres))
+    for i, val := range callres {
+        d, ok := val.(Dict)
+        if !ok {
+            return nil, &returnCodeError{RETURN_GENERIC_ERROR}
+        }
+        item, err := convertAddressDictToUserTypes(d)
+        if err != nil {
+            return nil, err
+        }
+        res[i] = item
+    }
+    return res, nil
+}
+
+func (c *Context) SetUpstreamRecursiveServers(servers List) error {
+    callservers := make(List, len(servers))
+    for i, val := range servers {
+        d, ok := val.(Dict)
+        if !ok {
+            return &returnCodeError{RETURN_GENERIC_ERROR}
+        }
+        c, err := convertAddressDictToCallTypes(d)
+        if err != nil {
+            return err
+        }
+        callservers[i] = c
+    }
+    ccallservers, err := convertListToC(callservers)
+    if err != nil {
+        return err
+    }
+    defer C.getdns_list_destroy(ccallservers)
+    rc := C.getdns_context_set_upstream_recursive_servers(c.ctx, ccallservers)
+    if rc != RETURN_GOOD {
+        return &returnCodeError{int(rc)}
+    }
+
+    return nil
+}
+
 func (c *Context) ImplementationString() string {
     return c.implementationString
 }

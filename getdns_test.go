@@ -673,3 +673,40 @@ func TestTLSQueryPaddingBlocksize(t *testing.T) {
         t.Fatal("Incorrect TLS Query Padding Blocksize: %v", edns)
     }
 }
+
+func TestUpstreamRecursiveServers(t *testing.T) {
+    c, err := getdns.CreateContext(true)
+    if c == nil {
+        t.Fatalf("No Context created: %s", err)
+    }
+    defer c.Destroy()
+
+    d := make(getdns.Dict)
+    d["address_type"] = "IPv4"
+    d["address_data"] = "192.168.0.1"
+    list := make(getdns.List, 1)
+    list[0] = d
+
+    err = c.SetUpstreamRecursiveServers(list)
+    if err != nil {
+        t.Fatalf("Can't set upstream recursive servers: %v", err)
+    }
+
+    res, err := c.UpstreamRecursiveServers()
+    if res == nil {
+        t.Fatalf("No upstream recursive servers: %s", err)
+    }
+
+    for _, val := range res {
+        dval, ok := val.(getdns.Dict)
+        if ok {
+            addr, ok := dval["address_data"].(string)
+            if ok && addr != "192.168.0.1" {
+                t.Errorf("Wrong address for upstream recursive servers: %v", addr)
+            }
+        }
+        if !ok {
+            t.Errorf("No address_type in upstream recursive servers: %v", val)
+        }
+    }
+}
