@@ -47,8 +47,9 @@ func (r *Result) getInt(key string) (uint32, error) {
     return uint32(res), nil
 }
 
-func (r *Result) AnswerType() (uint32, error) {
-    return r.getInt("answer_type")
+func (r *Result) AnswerType() (Nametype, error) {
+    res, err := r.getInt("answer_type")
+    return Nametype(res), err
 }
 
 func (r *Result) CanonicalName() (string, error) {

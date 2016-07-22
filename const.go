@@ -34,9 +34,11 @@ const (
 )
 
 // Response anwer types.
+type Nametype int
+
 const (
-    NAMETYPE_DNS  = C.GETDNS_NAMETYPE_DNS
-    NAMETYPE_WINS = C.GETDNS_NAMETYPE_WINS
+    NAMETYPE_DNS  Nametype = C.GETDNS_NAMETYPE_DNS
+    NAMETYPE_WINS          = C.GETDNS_NAMETYPE_WINS
 )
 
 // Extension request values.
