@@ -6,6 +6,7 @@ import "C"
 
 import (
     "fmt"
+    "strings"
 )
 
 // List is a Go type representing a getdns_list.
@@ -57,5 +58,31 @@ func ConvertDNSNameToFQDN(b []byte) (string, error) {
     if len(res) == 0 {
         res = "."
     }
+    return res, nil
+}
+
+// ConvertFQDNToDNSName converts a name to DNS label format.
+// It reimplements the getdns library routine in pure Go rather than
+// calling into the library. This implementation does not insist that
+// the name is in fact a FQDN; "www.example.com" produces the same
+// output as "www.example.com.".
+func ConvertFQDNToDNSName(s string) ([]byte, error) {
+    chunks := strings.Split(s, ".")
+    reslen := len(chunks) + 1
+    for _, c := range chunks {
+        if len(c) > 63 {
+            return nil, &returnCodeError{RETURN_INVALID_PARAMETER}
+        }
+        reslen += len(c)
+    }
+    res := make([]byte, reslen)
+    pos := 0
+    for _, c := range chunks {
+        res[pos] = byte(len(c))
+        pos++
+        copy(res[pos:], []byte(c))
+        pos += len(c)
+    }
+    res[pos] = 0
     return res, nil
 }

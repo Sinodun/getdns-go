@@ -6,6 +6,26 @@ import (
     "getdns"
 )
 
+func TestNameConversion(t *testing.T) {
+    tests := []string{"www.lunch.org.uk", ".", "", "example.com"}
+    answers := []string{"www.lunch.org.uk.", ".", ".", "example.com."}
+    for i, s := range tests {
+        label, err := getdns.ConvertFQDNToDNSName(s)
+        if err != nil {
+            t.Errorf("Name to DNS error: %s", err)
+            continue
+        }
+        back, err := getdns.ConvertDNSNameToFQDN(label)
+        if err != nil {
+            t.Errorf("DNS to Name error in %v (%s), %s", label, s, err)
+            continue
+        }
+        if answers[i] != back {
+            t.Errorf("Name conversion: %v != %v", back, answers[i])
+        }
+    }
+}
+
 func TestContextCreate(t *testing.T) {
     c, err := getdns.CreateContext(true)
     if c == nil {
