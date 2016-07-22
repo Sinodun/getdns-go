@@ -47,29 +47,29 @@ func convertDictToGo(dict *C.getdns_dict) (Dict, error) {
     var keys *C.getdns_list
     var nKeys C.size_t
 
-    rc := C.getdns_dict_get_names(dict, &keys)
+    rc := ReturnCode(C.getdns_dict_get_names(dict, &keys))
     if rc != RETURN_GOOD {
-        return nil, &returnCodeError{int(rc)}
+        return nil, &returnCodeError{rc}
     }
-    rc = C.getdns_list_get_length(keys, &nKeys)
+    rc = ReturnCode(C.getdns_list_get_length(keys, &nKeys))
     if rc != RETURN_GOOD {
-        return nil, &returnCodeError{int(rc)}
+        return nil, &returnCodeError{rc}
     }
 
     res := make(Dict)
     for i := 0; i < int(nKeys); i++ {
         var binName *C.getdns_bindata
-        rc = C.getdns_list_get_bindata(keys, C.size_t(i), &binName)
+        rc = ReturnCode(C.getdns_list_get_bindata(keys, C.size_t(i), &binName))
         if rc != RETURN_GOOD {
-            return nil, &returnCodeError{int(rc)}
+            return nil, &returnCodeError{rc}
         }
         cName := (*C.char)(unsafe.Pointer(binName.data))
         keyName := C.GoString(cName)
 
         var dataType C.getdns_data_type
-        rc = C.getdns_dict_get_data_type(dict, cName, &dataType)
+        rc = ReturnCode(C.getdns_dict_get_data_type(dict, cName, &dataType))
         if rc != RETURN_GOOD {
-            return nil, &returnCodeError{int(rc)}
+            return nil, &returnCodeError{rc}
         }
 
         var listItem *C.getdns_list
@@ -79,9 +79,9 @@ func convertDictToGo(dict *C.getdns_dict) (Dict, error) {
 
         switch dataType {
         case C.t_list:
-            rc = C.getdns_dict_get_list(dict, cName, &listItem)
+            rc = ReturnCode(C.getdns_dict_get_list(dict, cName, &listItem))
             if rc != RETURN_GOOD {
-                return nil, &returnCodeError{int(rc)}
+                return nil, &returnCodeError{rc}
             }
             li, err := convertListToGo(listItem)
             if err != nil {
@@ -90,9 +90,9 @@ func convertDictToGo(dict *C.getdns_dict) (Dict, error) {
             res[keyName] = li
 
         case C.t_dict:
-            rc = C.getdns_dict_get_dict(dict, cName, &dictItem)
+            rc = ReturnCode(C.getdns_dict_get_dict(dict, cName, &dictItem))
             if rc != RETURN_GOOD {
-                return nil, &returnCodeError{int(rc)}
+                return nil, &returnCodeError{rc}
             }
             d, err := convertDictToGo(dictItem)
             if err != nil {
@@ -101,16 +101,16 @@ func convertDictToGo(dict *C.getdns_dict) (Dict, error) {
             res[keyName] = d
 
         case C.t_int:
-            rc = C.getdns_dict_get_int(dict, cName, &intItem)
+            rc = ReturnCode(C.getdns_dict_get_int(dict, cName, &intItem))
             if rc != RETURN_GOOD {
-                return nil, &returnCodeError{int(rc)}
+                return nil, &returnCodeError{rc}
             }
             res[keyName] = int(intItem)
 
         case C.t_bindata:
-            rc = C.getdns_dict_get_bindata(dict, cName, &bindataItem)
+            rc = ReturnCode(C.getdns_dict_get_bindata(dict, cName, &bindataItem))
             if rc != RETURN_GOOD {
-                return nil, &returnCodeError{int(rc)}
+                return nil, &returnCodeError{rc}
             }
             res[keyName] = bindataToByteSlice(bindataItem)
 
@@ -124,9 +124,9 @@ func convertDictToGo(dict *C.getdns_dict) (Dict, error) {
 
 func convertListToGo(list *C.getdns_list) (List, error) {
     var length C.size_t
-    rc := C.getdns_list_get_length(list, &length)
+    rc := ReturnCode(C.getdns_list_get_length(list, &length))
     if rc != RETURN_GOOD {
-        return nil, &returnCodeError{int(rc)}
+        return nil, &returnCodeError{rc}
     }
 
     res := make(List, 0, int(length))
@@ -137,16 +137,16 @@ func convertListToGo(list *C.getdns_list) (List, error) {
         var intItem C.uint32_t
         var bindataItem *C.getdns_bindata
 
-        rc = C.getdns_list_get_data_type(list, C.size_t(i), &dataType)
+        rc = ReturnCode(C.getdns_list_get_data_type(list, C.size_t(i), &dataType))
         if rc != RETURN_GOOD {
-            return nil, &returnCodeError{int(rc)}
+            return nil, &returnCodeError{rc}
         }
 
         switch dataType {
         case C.t_list:
-            rc = C.getdns_list_get_list(list, C.size_t(i), &listItem)
+            rc = ReturnCode(C.getdns_list_get_list(list, C.size_t(i), &listItem))
             if rc != RETURN_GOOD {
-                return nil, &returnCodeError{int(rc)}
+                return nil, &returnCodeError{rc}
             }
             li, err := convertListToGo(listItem)
             if err != nil {
@@ -155,9 +155,9 @@ func convertListToGo(list *C.getdns_list) (List, error) {
             res = append(res, li)
 
         case C.t_dict:
-            rc = C.getdns_list_get_dict(list, C.size_t(i), &dictItem)
+            rc = ReturnCode(C.getdns_list_get_dict(list, C.size_t(i), &dictItem))
             if rc != RETURN_GOOD {
-                return nil, &returnCodeError{int(rc)}
+                return nil, &returnCodeError{rc}
             }
             d, err := convertDictToGo(dictItem)
             if err != nil {
@@ -166,16 +166,16 @@ func convertListToGo(list *C.getdns_list) (List, error) {
             res = append(res, d)
 
         case C.t_int:
-            rc = C.getdns_list_get_int(list, C.size_t(i), &intItem)
+            rc = ReturnCode(C.getdns_list_get_int(list, C.size_t(i), &intItem))
             if rc != RETURN_GOOD {
-                return nil, &returnCodeError{int(rc)}
+                return nil, &returnCodeError{rc}
             }
             res = append(res, int(intItem))
 
         case C.t_bindata:
-            rc = C.getdns_list_get_bindata(list, C.size_t(i), &bindataItem)
+            rc = ReturnCode(C.getdns_list_get_bindata(list, C.size_t(i), &bindataItem))
             if rc != RETURN_GOOD {
-                return nil, &returnCodeError{int(rc)}
+                return nil, &returnCodeError{rc}
             }
             res = append(res, bindataToByteSlice(bindataItem))
 
@@ -203,17 +203,17 @@ func convertDictToC(d Dict) (*C.getdns_dict, error) {
         ckey := C.CString(key)
         defer C.free(unsafe.Pointer(ckey))
 
-        var rc C.getdns_return_t
+        var rc ReturnCode
         switch val := item.(type) {
         case int:
-            rc = C.getdns_dict_set_int(res, ckey, C.uint32_t(val))
+            rc = ReturnCode(C.getdns_dict_set_int(res, ckey, C.uint32_t(val)))
 
         case string:
             b := []byte(val)
-            rc = C.dict_set_bindata(res, ckey, (*C.uint8_t)(unsafe.Pointer(&b[0])), C.size_t(len(b)))
+            rc = ReturnCode(C.dict_set_bindata(res, ckey, (*C.uint8_t)(unsafe.Pointer(&b[0])), C.size_t(len(b))))
 
         case []byte:
-            rc = C.dict_set_bindata(res, ckey, (*C.uint8_t)(unsafe.Pointer(&val[0])), C.size_t(len(val)))
+            rc = ReturnCode(C.dict_set_bindata(res, ckey, (*C.uint8_t)(unsafe.Pointer(&val[0])), C.size_t(len(val))))
 
         case Dict:
             d, err := convertDictToC(val)
@@ -221,7 +221,7 @@ func convertDictToC(d Dict) (*C.getdns_dict, error) {
                 C.getdns_dict_destroy(res)
                 return nil, err
             }
-            rc = C.getdns_dict_set_dict(res, ckey, d)
+            rc = ReturnCode(C.getdns_dict_set_dict(res, ckey, d))
 
         case List:
             l, err := convertListToC(val)
@@ -229,7 +229,7 @@ func convertDictToC(d Dict) (*C.getdns_dict, error) {
                 C.getdns_dict_destroy(res)
                 return nil, err
             }
-            rc = C.getdns_dict_set_list(res, ckey, l)
+            rc = ReturnCode(C.getdns_dict_set_list(res, ckey, l))
 
         default:
             C.getdns_dict_destroy(res)
@@ -237,7 +237,7 @@ func convertDictToC(d Dict) (*C.getdns_dict, error) {
         }
         if rc != RETURN_GOOD {
             C.getdns_dict_destroy(res)
-            return nil, &returnCodeError{int(rc)}
+            return nil, &returnCodeError{rc}
         }
     }
 
@@ -257,17 +257,17 @@ func convertListToC(l List) (*C.getdns_list, error) {
     }
 
     for i, item := range l {
-        var rc C.getdns_return_t
+        var rc ReturnCode
         switch val := item.(type) {
         case int:
-            rc = C.getdns_list_set_int(res, C.size_t(i), C.uint32_t(val))
+            rc = ReturnCode(C.getdns_list_set_int(res, C.size_t(i), C.uint32_t(val)))
 
         case string:
             b := []byte(val)
-            rc = C.list_set_bindata(res, C.size_t(i), (*C.uint8_t)(unsafe.Pointer(&b[0])), C.size_t(len(b)))
+            rc = ReturnCode(C.list_set_bindata(res, C.size_t(i), (*C.uint8_t)(unsafe.Pointer(&b[0])), C.size_t(len(b))))
 
         case []byte:
-            rc = C.list_set_bindata(res, C.size_t(i), (*C.uint8_t)(unsafe.Pointer(&val[0])), C.size_t(len(val)))
+            rc = ReturnCode(C.list_set_bindata(res, C.size_t(i), (*C.uint8_t)(unsafe.Pointer(&val[0])), C.size_t(len(val))))
 
         case Dict:
             d, err := convertDictToC(val)
@@ -275,7 +275,7 @@ func convertListToC(l List) (*C.getdns_list, error) {
                 C.getdns_list_destroy(res)
                 return nil, err
             }
-            rc = C.getdns_list_set_dict(res, C.size_t(i), d)
+            rc = ReturnCode(C.getdns_list_set_dict(res, C.size_t(i), d))
 
         case List:
             l, err := convertListToC(val)
@@ -283,7 +283,7 @@ func convertListToC(l List) (*C.getdns_list, error) {
                 C.getdns_list_destroy(res)
                 return nil, err
             }
-            rc = C.getdns_list_set_list(res, C.size_t(i), l)
+            rc = ReturnCode(C.getdns_list_set_list(res, C.size_t(i), l))
 
         default:
             C.getdns_list_destroy(res)
@@ -291,7 +291,7 @@ func convertListToC(l List) (*C.getdns_list, error) {
         }
         if rc != RETURN_GOOD {
             C.getdns_list_destroy(res)
-            return nil, &returnCodeError{int(rc)}
+            return nil, &returnCodeError{rc}
         }
     }
 

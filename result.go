@@ -40,9 +40,9 @@ func (r *Result) getInt(key string) (uint32, error) {
     var res C.uint32_t
     ckey := C.CString(key)
     defer C.free(unsafe.Pointer(ckey))
-    rc := C.getdns_dict_get_int(r.res, ckey, &res)
+    rc := ReturnCode(C.getdns_dict_get_int(r.res, ckey, &res))
     if rc != RETURN_GOOD {
-        return 0, &returnCodeError{int(rc)}
+        return 0, &returnCodeError{rc}
     }
     return uint32(res), nil
 }
@@ -54,9 +54,9 @@ func (r *Result) AnswerType() (uint32, error) {
 func (r *Result) CanonicalName() (string, error) {
     var bindata *C.getdns_bindata
 
-    rc := C.getdns_dict_get_bindata(r.res, cCANONICAL_NAME, &bindata)
+    rc := ReturnCode(C.getdns_dict_get_bindata(r.res, cCANONICAL_NAME, &bindata))
     if rc != RETURN_GOOD {
-        return "", &returnCodeError{int(rc)}
+        return "", &returnCodeError{rc}
     }
 
     b := bindataToByteSlice(bindata)
@@ -71,9 +71,9 @@ func (r *Result) CanonicalName() (string, error) {
 func (r *Result) JustAddressAnswers() ([]Dict, error) {
     var list *C.getdns_list
 
-    rc := C.getdns_dict_get_list(r.res, cJUST_ADDRESS_ANSWERS, &list)
+    rc := ReturnCode(C.getdns_dict_get_list(r.res, cJUST_ADDRESS_ANSWERS, &list))
     if rc != RETURN_GOOD {
-        return nil, &returnCodeError{int(rc)}
+        return nil, &returnCodeError{rc}
     }
 
     return makeAddressDictList(list)
@@ -86,9 +86,9 @@ func (r *Result) RepliesFull() (Dict, error) {
 func (r *Result) RepliesTree() (List, error) {
     var list *C.getdns_list
 
-    rc := C.getdns_dict_get_list(r.res, cREPLIES_TREE, &list)
+    rc := ReturnCode(C.getdns_dict_get_list(r.res, cREPLIES_TREE, &list))
     if rc != RETURN_GOOD {
-        return nil, &returnCodeError{int(rc)}
+        return nil, &returnCodeError{rc}
     }
     return convertListToGo(list)
 }
@@ -96,9 +96,9 @@ func (r *Result) RepliesTree() (List, error) {
 func (r *Result) ValidationChain() (List, error) {
     var list *C.getdns_list
 
-    rc := C.getdns_dict_get_list(r.res, cVALIDATION_CHAIN, &list)
+    rc := ReturnCode(C.getdns_dict_get_list(r.res, cVALIDATION_CHAIN, &list))
     if rc != RETURN_GOOD {
-        return nil, &returnCodeError{int(rc)}
+        return nil, &returnCodeError{rc}
     }
     return convertListToGo(list)
 }

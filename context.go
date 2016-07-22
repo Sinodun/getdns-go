@@ -21,9 +21,9 @@ func CreateContext(setFromOS bool) (*Context, error) {
         csetFromOS = 1
     }
     var ctx *C.getdns_context
-    rc := C.getdns_context_create(&ctx, csetFromOS)
+    rc := ReturnCode(C.getdns_context_create(&ctx, csetFromOS))
     if rc != RETURN_GOOD {
-        return nil, &returnCodeError{int(rc)}
+        return nil, &returnCodeError{rc}
     }
 
     res := &Context{ctx: ctx}
@@ -75,9 +75,9 @@ func (c *Context) Address(name string, exts Dict) (*Result, error) {
     }
     cname := C.CString(name)
     defer C.free(unsafe.Pointer(cname))
-    rc := C.getdns_address_sync(c.ctx, cname, cexts, &res)
+    rc := ReturnCode(C.getdns_address_sync(c.ctx, cname, cexts, &res))
     if rc != RETURN_GOOD {
-        return nil, &returnCodeError{int(rc)}
+        return nil, &returnCodeError{rc}
     }
 
     return createResult(res), nil
@@ -97,9 +97,9 @@ func (c *Context) General(name string, requestType uint, exts Dict) (*Result, er
     }
     cname := C.CString(name)
     defer C.free(unsafe.Pointer(cname))
-    rc := C.getdns_general_sync(c.ctx, cname, C.uint16_t(requestType), cexts, &res)
+    rc := ReturnCode(C.getdns_general_sync(c.ctx, cname, C.uint16_t(requestType), cexts, &res))
     if rc != RETURN_GOOD {
-        return nil, &returnCodeError{int(rc)}
+        return nil, &returnCodeError{rc}
     }
 
     return createResult(res), nil
@@ -135,9 +135,9 @@ func (c *Context) Hostname(address Dict, exts Dict) (*Result, error) {
     if err != nil {
         return nil, err
     }
-    rc := C.getdns_hostname_sync(c.ctx, caddr, cexts, &res)
+    rc := ReturnCode(C.getdns_hostname_sync(c.ctx, caddr, cexts, &res))
     if rc != RETURN_GOOD {
-        return nil, &returnCodeError{int(rc)}
+        return nil, &returnCodeError{rc}
     }
 
     return createResult(res), nil
@@ -157,9 +157,9 @@ func (c *Context) Service(name string, exts Dict) (*Result, error) {
     }
     cname := C.CString(name)
     defer C.free(unsafe.Pointer(cname))
-    rc := C.getdns_service_sync(c.ctx, cname, cexts, &res)
+    rc := ReturnCode(C.getdns_service_sync(c.ctx, cname, cexts, &res))
     if rc != RETURN_GOOD {
-        return nil, &returnCodeError{int(rc)}
+        return nil, &returnCodeError{rc}
     }
 
     return createResult(res), nil
@@ -167,26 +167,26 @@ func (c *Context) Service(name string, exts Dict) (*Result, error) {
 
 func (c *Context) AppendName() (int, error) {
     var res C.getdns_append_name_t
-    rc := C.getdns_context_get_append_name(c.ctx, &res)
+    rc := ReturnCode(C.getdns_context_get_append_name(c.ctx, &res))
     if rc != RETURN_GOOD {
-        return 0, &returnCodeError{int(rc)}
+        return 0, &returnCodeError{rc}
     }
     return int(res), nil
 }
 
 func (c *Context) SetAppendName(appendName int) error {
-    rc := C.getdns_context_set_append_name(c.ctx, C.getdns_append_name_t(appendName))
+    rc := ReturnCode(C.getdns_context_set_append_name(c.ctx, C.getdns_append_name_t(appendName)))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
     return nil
 }
 
 func (c *Context) DNSRootServers() ([]Dict, error) {
     var list *C.getdns_list
-    rc := C.getdns_context_get_dns_root_servers(c.ctx, &list)
+    rc := ReturnCode(C.getdns_context_get_dns_root_servers(c.ctx, &list))
     if rc != RETURN_GOOD {
-        return nil, &returnCodeError{int(rc)}
+        return nil, &returnCodeError{rc}
     }
 
     return makeAddressDictList(list)
@@ -207,9 +207,9 @@ func (c *Context) SetDNSRootServers(servers []Dict) error {
         return err
     }
     defer C.getdns_list_destroy(clist)
-    rc := C.getdns_context_set_dns_root_servers(c.ctx, clist)
+    rc := ReturnCode(C.getdns_context_set_dns_root_servers(c.ctx, clist))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
     return nil
 }
@@ -217,9 +217,9 @@ func (c *Context) SetDNSRootServers(servers []Dict) error {
 func (c *Context) DNSTransportList() ([]int, error) {
     var list *C.getdns_transport_list_t
     var listSize C.size_t
-    rc := C.getdns_context_get_dns_transport_list(c.ctx, &listSize, &list)
+    rc := ReturnCode(C.getdns_context_get_dns_transport_list(c.ctx, &listSize, &list))
     if rc != RETURN_GOOD {
-        return nil, &returnCodeError{int(rc)}
+        return nil, &returnCodeError{rc}
     }
 
     res := make([]int, int(listSize))
@@ -235,9 +235,9 @@ func (c *Context) SetDNSTransportList(list []int) error {
     for i, val := range list {
         clist[i] = C.int(val)
     }
-    rc := C.getdns_context_set_dns_transport_list(c.ctx, C.size_t(len(list)), (*C.getdns_transport_list_t)(unsafe.Pointer(&clist[0])))
+    rc := ReturnCode(C.getdns_context_set_dns_transport_list(c.ctx, C.size_t(len(list)), (*C.getdns_transport_list_t)(unsafe.Pointer(&clist[0]))))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
 
     return nil
@@ -245,9 +245,9 @@ func (c *Context) SetDNSTransportList(list []int) error {
 
 func (c *Context) DNSSECAllowedSkew() (uint32, error) {
     var res C.uint32_t
-    rc := C.getdns_context_get_dnssec_allowed_skew(c.ctx, &res)
+    rc := ReturnCode(C.getdns_context_get_dnssec_allowed_skew(c.ctx, &res))
     if rc != RETURN_GOOD {
-        return 0, &returnCodeError{int(rc)}
+        return 0, &returnCodeError{rc}
     }
 
     return uint32(res), nil
@@ -255,9 +255,9 @@ func (c *Context) DNSSECAllowedSkew() (uint32, error) {
 
 func (c *Context) SetDNSSECAllowedSkew(skew uint32) error {
     var cskew C.uint32_t = C.uint32_t(skew)
-    rc := C.getdns_context_set_dnssec_allowed_skew(c.ctx, cskew)
+    rc := ReturnCode(C.getdns_context_set_dnssec_allowed_skew(c.ctx, cskew))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
 
     return nil
@@ -265,9 +265,9 @@ func (c *Context) SetDNSSECAllowedSkew(skew uint32) error {
 
 func (c *Context) DNSSECTrustAnchors() (List, error) {
     var list *C.getdns_list
-    rc := C.getdns_context_get_dnssec_trust_anchors(c.ctx, &list)
+    rc := ReturnCode(C.getdns_context_get_dnssec_trust_anchors(c.ctx, &list))
     if rc != RETURN_GOOD {
-        return nil, &returnCodeError{int(rc)}
+        return nil, &returnCodeError{rc}
     }
 
     return convertListToGo(list)
@@ -279,9 +279,9 @@ func (c *Context) SetDNSSECTrustAnchors(anchors List) error {
         return err
     }
     defer C.getdns_list_destroy(canchors)
-    rc := C.getdns_context_set_dnssec_trust_anchors(c.ctx, canchors)
+    rc := ReturnCode(C.getdns_context_set_dnssec_trust_anchors(c.ctx, canchors))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
 
     return nil
@@ -289,9 +289,9 @@ func (c *Context) SetDNSSECTrustAnchors(anchors List) error {
 
 func (c *Context) EDNSClientSubnetPrivate() (bool, error) {
     var val C.uint8_t
-    rc := C.getdns_context_get_edns_client_subnet_private(c.ctx, &val)
+    rc := ReturnCode(C.getdns_context_get_edns_client_subnet_private(c.ctx, &val))
     if rc != RETURN_GOOD {
-        return false, &returnCodeError{int(rc)}
+        return false, &returnCodeError{rc}
     }
 
     return (val == 1), nil
@@ -302,9 +302,9 @@ func (c *Context) SetEDNSClientSubnetPrivate(private bool) error {
     if private {
         cskew = 1
     }
-    rc := C.getdns_context_set_edns_client_subnet_private(c.ctx, cskew)
+    rc := ReturnCode(C.getdns_context_set_edns_client_subnet_private(c.ctx, cskew))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
 
     return nil
@@ -312,9 +312,9 @@ func (c *Context) SetEDNSClientSubnetPrivate(private bool) error {
 
 func (c *Context) EDNSDoBit() (bool, error) {
     var val C.uint8_t
-    rc := C.getdns_context_get_edns_do_bit(c.ctx, &val)
+    rc := ReturnCode(C.getdns_context_get_edns_do_bit(c.ctx, &val))
     if rc != RETURN_GOOD {
-        return false, &returnCodeError{int(rc)}
+        return false, &returnCodeError{rc}
     }
 
     return (val == 1), nil
@@ -325,9 +325,9 @@ func (c *Context) SetEDNSDoBit(newval bool) error {
     if newval {
         do = 1
     }
-    rc := C.getdns_context_set_edns_do_bit(c.ctx, do)
+    rc := ReturnCode(C.getdns_context_set_edns_do_bit(c.ctx, do))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
 
     return nil
@@ -335,18 +335,18 @@ func (c *Context) SetEDNSDoBit(newval bool) error {
 
 func (c *Context) EDNSExtendedRcode() (uint8, error) {
     var val C.uint8_t
-    rc := C.getdns_context_get_edns_extended_rcode(c.ctx, &val)
+    rc := ReturnCode(C.getdns_context_get_edns_extended_rcode(c.ctx, &val))
     if rc != RETURN_GOOD {
-        return 0, &returnCodeError{int(rc)}
+        return 0, &returnCodeError{rc}
     }
 
     return uint8(val), nil
 }
 
 func (c *Context) SetEDNSExtendedRcode(newval uint8) error {
-    rc := C.getdns_context_set_edns_extended_rcode(c.ctx, C.uint8_t(newval))
+    rc := ReturnCode(C.getdns_context_set_edns_extended_rcode(c.ctx, C.uint8_t(newval)))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
 
     return nil
@@ -354,18 +354,18 @@ func (c *Context) SetEDNSExtendedRcode(newval uint8) error {
 
 func (c *Context) EDNSMaximumUDPPayloadSize() (uint16, error) {
     var val C.uint16_t
-    rc := C.getdns_context_get_edns_maximum_udp_payload_size(c.ctx, &val)
+    rc := ReturnCode(C.getdns_context_get_edns_maximum_udp_payload_size(c.ctx, &val))
     if rc != RETURN_GOOD {
-        return 0, &returnCodeError{int(rc)}
+        return 0, &returnCodeError{rc}
     }
 
     return uint16(val), nil
 }
 
 func (c *Context) SetEDNSMaximumUDPPayloadSize(newval uint16) error {
-    rc := C.getdns_context_set_edns_maximum_udp_payload_size(c.ctx, C.uint16_t(newval))
+    rc := ReturnCode(C.getdns_context_set_edns_maximum_udp_payload_size(c.ctx, C.uint16_t(newval)))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
 
     return nil
@@ -373,18 +373,18 @@ func (c *Context) SetEDNSMaximumUDPPayloadSize(newval uint16) error {
 
 func (c *Context) EDNSVersion() (uint8, error) {
     var val C.uint8_t
-    rc := C.getdns_context_get_edns_version(c.ctx, &val)
+    rc := ReturnCode(C.getdns_context_get_edns_version(c.ctx, &val))
     if rc != RETURN_GOOD {
-        return 0, &returnCodeError{int(rc)}
+        return 0, &returnCodeError{rc}
     }
 
     return uint8(val), nil
 }
 
 func (c *Context) SetEDNSVersion(newval uint8) error {
-    rc := C.getdns_context_set_edns_version(c.ctx, C.uint8_t(newval))
+    rc := ReturnCode(C.getdns_context_set_edns_version(c.ctx, C.uint8_t(newval)))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
 
     return nil
@@ -392,18 +392,18 @@ func (c *Context) SetEDNSVersion(newval uint8) error {
 
 func (c *Context) FollowRedirects() (int, error) {
     var val C.getdns_redirects_t
-    rc := C.getdns_context_get_follow_redirects(c.ctx, &val)
+    rc := ReturnCode(C.getdns_context_get_follow_redirects(c.ctx, &val))
     if rc != RETURN_GOOD {
-        return 0, &returnCodeError{int(rc)}
+        return 0, &returnCodeError{rc}
     }
 
     return int(val), nil
 }
 
 func (c *Context) SetFollowRedirects(newval int) error {
-    rc := C.getdns_context_set_follow_redirects(c.ctx, C.getdns_redirects_t(newval))
+    rc := ReturnCode(C.getdns_context_set_follow_redirects(c.ctx, C.getdns_redirects_t(newval)))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
 
     return nil
@@ -411,18 +411,18 @@ func (c *Context) SetFollowRedirects(newval int) error {
 
 func (c *Context) IdleTimeout() (uint64, error) {
     var val C.uint64_t
-    rc := C.getdns_context_get_idle_timeout(c.ctx, &val)
+    rc := ReturnCode(C.getdns_context_get_idle_timeout(c.ctx, &val))
     if rc != RETURN_GOOD {
-        return 0, &returnCodeError{int(rc)}
+        return 0, &returnCodeError{rc}
     }
 
     return uint64(val), nil
 }
 
 func (c *Context) SetIdleTimeout(newval uint64) error {
-    rc := C.getdns_context_set_idle_timeout(c.ctx, C.uint64_t(newval))
+    rc := ReturnCode(C.getdns_context_set_idle_timeout(c.ctx, C.uint64_t(newval)))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
 
     return nil
@@ -430,18 +430,18 @@ func (c *Context) SetIdleTimeout(newval uint64) error {
 
 func (c *Context) LimitOutstandingQueries() (uint16, error) {
     var val C.uint16_t
-    rc := C.getdns_context_get_limit_outstanding_queries(c.ctx, &val)
+    rc := ReturnCode(C.getdns_context_get_limit_outstanding_queries(c.ctx, &val))
     if rc != RETURN_GOOD {
-        return 0, &returnCodeError{int(rc)}
+        return 0, &returnCodeError{rc}
     }
 
     return uint16(val), nil
 }
 
 func (c *Context) SetLimitOutstandingQueries(newval uint16) error {
-    rc := C.getdns_context_set_limit_outstanding_queries(c.ctx, C.uint16_t(newval))
+    rc := ReturnCode(C.getdns_context_set_limit_outstanding_queries(c.ctx, C.uint16_t(newval)))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
 
     return nil
@@ -450,9 +450,9 @@ func (c *Context) SetLimitOutstandingQueries(newval uint16) error {
 func (c *Context) Namespaces() ([]int, error) {
     var list *C.getdns_namespace_t
     var listSize C.size_t
-    rc := C.getdns_context_get_namespaces(c.ctx, &listSize, &list)
+    rc := ReturnCode(C.getdns_context_get_namespaces(c.ctx, &listSize, &list))
     if rc != RETURN_GOOD {
-        return nil, &returnCodeError{int(rc)}
+        return nil, &returnCodeError{rc}
     }
 
     res := make([]int, int(listSize))
@@ -468,9 +468,9 @@ func (c *Context) SetNamespaces(list []int) error {
     for i, val := range list {
         clist[i] = C.int(val)
     }
-    rc := C.getdns_context_set_namespaces(c.ctx, C.size_t(len(list)), (*C.getdns_namespace_t)(unsafe.Pointer(&clist[0])))
+    rc := ReturnCode(C.getdns_context_set_namespaces(c.ctx, C.size_t(len(list)), (*C.getdns_namespace_t)(unsafe.Pointer(&clist[0]))))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
 
     return nil
@@ -478,26 +478,26 @@ func (c *Context) SetNamespaces(list []int) error {
 
 func (c *Context) ResolutionType() (int, error) {
     var res C.getdns_resolution_t
-    rc := C.getdns_context_get_resolution_type(c.ctx, &res)
+    rc := ReturnCode(C.getdns_context_get_resolution_type(c.ctx, &res))
     if rc != RETURN_GOOD {
-        return 0, &returnCodeError{int(rc)}
+        return 0, &returnCodeError{rc}
     }
     return int(res), nil
 }
 
 func (c *Context) SetResolutionType(newval int) error {
-    rc := C.getdns_context_set_resolution_type(c.ctx, C.getdns_resolution_t(newval))
+    rc := ReturnCode(C.getdns_context_set_resolution_type(c.ctx, C.getdns_resolution_t(newval)))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
     return nil
 }
 
 func (c *Context) Suffix() ([]string, error) {
     var list *C.getdns_list
-    rc := C.getdns_context_get_suffix(c.ctx, &list)
+    rc := ReturnCode(C.getdns_context_get_suffix(c.ctx, &list))
     if rc != RETURN_GOOD {
-        return nil, &returnCodeError{int(rc)}
+        return nil, &returnCodeError{rc}
     }
 
     glist, err := convertListToGo(list)
@@ -531,9 +531,9 @@ func (c *Context) SetSuffix(list []string) error {
         return err
     }
     defer C.getdns_list_destroy(clist)
-    rc := C.getdns_context_set_suffix(c.ctx, clist)
+    rc := ReturnCode(C.getdns_context_set_suffix(c.ctx, clist))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
 
     return nil
@@ -541,18 +541,18 @@ func (c *Context) SetSuffix(list []string) error {
 
 func (c *Context) Timeout() (uint64, error) {
     var val C.uint64_t
-    rc := C.getdns_context_get_timeout(c.ctx, &val)
+    rc := ReturnCode(C.getdns_context_get_timeout(c.ctx, &val))
     if rc != RETURN_GOOD {
-        return 0, &returnCodeError{int(rc)}
+        return 0, &returnCodeError{rc}
     }
 
     return uint64(val), nil
 }
 
 func (c *Context) SetTimeout(newval uint64) error {
-    rc := C.getdns_context_set_timeout(c.ctx, C.uint64_t(newval))
+    rc := ReturnCode(C.getdns_context_set_timeout(c.ctx, C.uint64_t(newval)))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
 
     return nil
@@ -560,18 +560,18 @@ func (c *Context) SetTimeout(newval uint64) error {
 
 func (c *Context) TLSAuthentication() (int, error) {
     var val C.getdns_tls_authentication_t
-    rc := C.getdns_context_get_tls_authentication(c.ctx, &val)
+    rc := ReturnCode(C.getdns_context_get_tls_authentication(c.ctx, &val))
     if rc != RETURN_GOOD {
-        return 0, &returnCodeError{int(rc)}
+        return 0, &returnCodeError{rc}
     }
 
     return int(val), nil
 }
 
 func (c *Context) SetTLSAuthentication(newval int) error {
-    rc := C.getdns_context_set_tls_authentication(c.ctx, C.getdns_tls_authentication_t(newval))
+    rc := ReturnCode(C.getdns_context_set_tls_authentication(c.ctx, C.getdns_tls_authentication_t(newval)))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
 
     return nil
@@ -579,18 +579,18 @@ func (c *Context) SetTLSAuthentication(newval int) error {
 
 func (c *Context) TLSQueryPaddingBlocksize() (uint16, error) {
     var val C.uint16_t
-    rc := C.getdns_context_get_tls_query_padding_blocksize(c.ctx, &val)
+    rc := ReturnCode(C.getdns_context_get_tls_query_padding_blocksize(c.ctx, &val))
     if rc != RETURN_GOOD {
-        return 0, &returnCodeError{int(rc)}
+        return 0, &returnCodeError{rc}
     }
 
     return uint16(val), nil
 }
 
 func (c *Context) SetTLSQueryPaddingBlocksize(newval uint16) error {
-    rc := C.getdns_context_set_tls_query_padding_blocksize(c.ctx, C.uint16_t(newval))
+    rc := ReturnCode(C.getdns_context_set_tls_query_padding_blocksize(c.ctx, C.uint16_t(newval)))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
 
     return nil
@@ -598,9 +598,9 @@ func (c *Context) SetTLSQueryPaddingBlocksize(newval uint16) error {
 
 func (c *Context) UpstreamRecursiveServers() (List, error) {
     var list *C.getdns_list
-    rc := C.getdns_context_get_upstream_recursive_servers(c.ctx, &list)
+    rc := ReturnCode(C.getdns_context_get_upstream_recursive_servers(c.ctx, &list))
     if rc != RETURN_GOOD {
-        return nil, &returnCodeError{int(rc)}
+        return nil, &returnCodeError{rc}
     }
 
     callres, err := convertListToGo(list)
@@ -641,9 +641,9 @@ func (c *Context) SetUpstreamRecursiveServers(servers List) error {
         return err
     }
     defer C.getdns_list_destroy(ccallservers)
-    rc := C.getdns_context_set_upstream_recursive_servers(c.ctx, ccallservers)
+    rc := ReturnCode(C.getdns_context_set_upstream_recursive_servers(c.ctx, ccallservers))
     if rc != RETURN_GOOD {
-        return &returnCodeError{int(rc)}
+        return &returnCodeError{rc}
     }
 
     return nil

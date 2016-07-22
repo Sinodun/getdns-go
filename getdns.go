@@ -17,15 +17,15 @@ type Dict map[string]interface{}
 // Error reports a getdns return code.
 type Error interface {
     error
-    ReturnCode() int
+    ReturnCode() ReturnCode
 }
 
 type returnCodeError struct {
-    rc int
+    rc ReturnCode
 }
 
 // Code returns the getdns numeric return code.
-func (err *returnCodeError) ReturnCode() int {
+func (err *returnCodeError) ReturnCode() ReturnCode {
     return err.rc
 }
 
