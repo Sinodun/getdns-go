@@ -558,17 +558,17 @@ func (c *Context) SetTimeout(newval uint64) error {
     return nil
 }
 
-func (c *Context) TLSAuthentication() (int, error) {
+func (c *Context) TLSAuthentication() (TLSAuthentication, error) {
     var val C.getdns_tls_authentication_t
     rc := ReturnCode(C.getdns_context_get_tls_authentication(c.ctx, &val))
     if rc != RETURN_GOOD {
         return 0, &returnCodeError{rc}
     }
 
-    return int(val), nil
+    return TLSAuthentication(val), nil
 }
 
-func (c *Context) SetTLSAuthentication(newval int) error {
+func (c *Context) SetTLSAuthentication(newval TLSAuthentication) error {
     rc := ReturnCode(C.getdns_context_set_tls_authentication(c.ctx, C.getdns_tls_authentication_t(newval)))
     if rc != RETURN_GOOD {
         return &returnCodeError{rc}
