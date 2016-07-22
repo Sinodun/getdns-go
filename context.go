@@ -165,16 +165,16 @@ func (c *Context) Service(name string, exts Dict) (*Result, error) {
     return createResult(res), nil
 }
 
-func (c *Context) AppendName() (int, error) {
+func (c *Context) AppendName() (AppendName, error) {
     var res C.getdns_append_name_t
     rc := ReturnCode(C.getdns_context_get_append_name(c.ctx, &res))
     if rc != RETURN_GOOD {
         return 0, &returnCodeError{rc}
     }
-    return int(res), nil
+    return AppendName(res), nil
 }
 
-func (c *Context) SetAppendName(appendName int) error {
+func (c *Context) SetAppendName(appendName AppendName) error {
     rc := ReturnCode(C.getdns_context_set_append_name(c.ctx, C.getdns_append_name_t(appendName)))
     if rc != RETURN_GOOD {
         return &returnCodeError{rc}
