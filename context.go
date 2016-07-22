@@ -476,16 +476,16 @@ func (c *Context) SetNamespaces(list []Namespace) error {
     return nil
 }
 
-func (c *Context) ResolutionType() (int, error) {
+func (c *Context) ResolutionType() (Resolution, error) {
     var res C.getdns_resolution_t
     rc := ReturnCode(C.getdns_context_get_resolution_type(c.ctx, &res))
     if rc != RETURN_GOOD {
         return 0, &returnCodeError{rc}
     }
-    return int(res), nil
+    return Resolution(res), nil
 }
 
-func (c *Context) SetResolutionType(newval int) error {
+func (c *Context) SetResolutionType(newval Resolution) error {
     rc := ReturnCode(C.getdns_context_set_resolution_type(c.ctx, C.getdns_resolution_t(newval)))
     if rc != RETURN_GOOD {
         return &returnCodeError{rc}

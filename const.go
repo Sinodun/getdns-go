@@ -172,9 +172,11 @@ const (
 )
 
 // Context resolution types.
+type Resolution int
+
 const (
-    RESOLUTION_STUB      = C.GETDNS_RESOLUTION_STUB
-    RESOLUTION_RECURSING = C.GETDNS_RESOLUTION_RECURSING
+    RESOLUTION_STUB      Resolution = C.GETDNS_RESOLUTION_STUB
+    RESOLUTION_RECURSING            = C.GETDNS_RESOLUTION_RECURSING
 )
 
 // Context authentication options when using TLS.
