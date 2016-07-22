@@ -447,7 +447,7 @@ func (c *Context) SetLimitOutstandingQueries(newval uint16) error {
     return nil
 }
 
-func (c *Context) Namespaces() ([]int, error) {
+func (c *Context) Namespaces() ([]Namespace, error) {
     var list *C.getdns_namespace_t
     var listSize C.size_t
     rc := ReturnCode(C.getdns_context_get_namespaces(c.ctx, &listSize, &list))
@@ -455,15 +455,15 @@ func (c *Context) Namespaces() ([]int, error) {
         return nil, &returnCodeError{rc}
     }
 
-    res := make([]int, int(listSize))
+    res := make([]Namespace, int(listSize))
     cres := (*[1 << 30]C.int)(unsafe.Pointer(list))[:listSize:listSize]
     for i, val := range cres {
-        res[i] = int(val)
+        res[i] = Namespace(val)
     }
     return res, nil
 }
 
-func (c *Context) SetNamespaces(list []int) error {
+func (c *Context) SetNamespaces(list []Namespace) error {
     clist := make([]C.int, len(list))
     for i, val := range list {
         clist[i] = C.int(val)

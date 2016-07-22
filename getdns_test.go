@@ -549,7 +549,7 @@ func TestNamespaces(t *testing.T) {
     }
     defer c.Destroy()
 
-    err = c.SetNamespaces([]int{getdns.NAMESPACE_DNS, getdns.NAMESPACE_LOCALNAMES})
+    err = c.SetNamespaces([]getdns.Namespace{getdns.NAMESPACE_DNS, getdns.NAMESPACE_LOCALNAMES})
     if err != nil {
         t.Fatalf("Can't set namespaces: %s", err)
     }
