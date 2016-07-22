@@ -390,17 +390,17 @@ func (c *Context) SetEDNSVersion(newval uint8) error {
     return nil
 }
 
-func (c *Context) FollowRedirects() (int, error) {
+func (c *Context) FollowRedirects() (Redirects, error) {
     var val C.getdns_redirects_t
     rc := ReturnCode(C.getdns_context_get_follow_redirects(c.ctx, &val))
     if rc != RETURN_GOOD {
         return 0, &returnCodeError{rc}
     }
 
-    return int(val), nil
+    return Redirects(val), nil
 }
 
-func (c *Context) SetFollowRedirects(newval int) error {
+func (c *Context) SetFollowRedirects(newval Redirects) error {
     rc := ReturnCode(C.getdns_context_set_follow_redirects(c.ctx, C.getdns_redirects_t(newval)))
     if rc != RETURN_GOOD {
         return &returnCodeError{rc}

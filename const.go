@@ -159,9 +159,11 @@ const (
 )
 
 // Context redirects follow options.
+type Redirects int
+
 const (
-    REDIRECTS_FOLLOW        = C.GETDNS_REDIRECTS_FOLLOW
-    REDIRECTS_DO_NOT_FOLLOW = C.GETDNS_REDIRECTS_DO_NOT_FOLLOW
+    REDIRECTS_FOLLOW        Redirects = C.GETDNS_REDIRECTS_FOLLOW
+    REDIRECTS_DO_NOT_FOLLOW           = C.GETDNS_REDIRECTS_DO_NOT_FOLLOW
 )
 
 // Context namespace types.
