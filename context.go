@@ -214,7 +214,7 @@ func (c *Context) SetDNSRootServers(servers []Dict) error {
     return nil
 }
 
-func (c *Context) DNSTransportList() ([]int, error) {
+func (c *Context) DNSTransportList() ([]Transport, error) {
     var list *C.getdns_transport_list_t
     var listSize C.size_t
     rc := ReturnCode(C.getdns_context_get_dns_transport_list(c.ctx, &listSize, &list))
@@ -222,15 +222,15 @@ func (c *Context) DNSTransportList() ([]int, error) {
         return nil, &returnCodeError{rc}
     }
 
-    res := make([]int, int(listSize))
+    res := make([]Transport, int(listSize))
     cres := (*[1 << 30]C.int)(unsafe.Pointer(list))[:listSize:listSize]
     for i, val := range cres {
-        res[i] = int(val)
+        res[i] = Transport(val)
     }
     return res, nil
 }
 
-func (c *Context) SetDNSTransportList(list []int) error {
+func (c *Context) SetDNSTransportList(list []Transport) error {
     clist := make([]C.int, len(list))
     for i, val := range list {
         clist[i] = C.int(val)

@@ -297,7 +297,7 @@ func TestDNSTransportList(t *testing.T) {
     }
     defer c.Destroy()
 
-    err = c.SetDNSTransportList([]int{getdns.TRANSPORT_UDP, getdns.TRANSPORT_TCP, getdns.TRANSPORT_TLS})
+    err = c.SetDNSTransportList([]getdns.Transport{getdns.TRANSPORT_UDP, getdns.TRANSPORT_TCP, getdns.TRANSPORT_TLS})
     if err != nil {
         t.Fatalf("Can't set transport list: %s", err)
     }

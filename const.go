@@ -148,10 +148,12 @@ const (
 )
 
 // Context transport list options.
+type Transport int
+
 const (
-    TRANSPORT_UDP = C.GETDNS_TRANSPORT_UDP
-    TRANSPORT_TCP = C.GETDNS_TRANSPORT_TCP
-    TRANSPORT_TLS = C.GETDNS_TRANSPORT_TLS
+    TRANSPORT_UDP Transport = C.GETDNS_TRANSPORT_UDP
+    TRANSPORT_TCP           = C.GETDNS_TRANSPORT_TCP
+    TRANSPORT_TLS           = C.GETDNS_TRANSPORT_TLS
 )
 
 // Context redirects follow options.
