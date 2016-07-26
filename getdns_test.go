@@ -730,3 +730,22 @@ func TestUpstreamRecursiveServers(t *testing.T) {
         }
     }
 }
+
+func TestIDNConversions(t *testing.T) {
+    _, err := getdns.ALabelToULabel("xn--p1acf")
+    if err != nil {
+        t.Error("alabel conversion failed")
+    }
+    _, err = getdns.ULabelToALabel("рус")
+    if err != nil {
+        t.Error("ulabel conversion failed")
+    }
+    _, err = getdns.ALabelToULabel("xn--vermgensberatung-pwb")
+    if err != nil {
+        t.Error("alabel1 conversion failed")
+    }
+    _, err = getdns.ULabelToALabel("vermögensberatung")
+    if err != nil {
+        t.Error("ulabel1 conversion failed")
+    }
+}

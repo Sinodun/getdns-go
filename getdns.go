@@ -7,6 +7,7 @@ import "C"
 import (
     "fmt"
     "strings"
+    "unsafe"
 )
 
 // List is a Go type representing a getdns_list.
@@ -84,5 +85,31 @@ func ConvertFQDNToDNSName(s string) ([]byte, error) {
         pos += len(c)
     }
     res[pos] = 0
+    return res, nil
+}
+
+// Convert IDN ASCII label to Unicode, translating Punycode if present.
+func ALabelToULabel(s string) (string, error) {
+    cname := C.CString(s)
+    defer C.free(unsafe.Pointer(cname))
+    cres := C.getdns_convert_alabel_to_ulabel(cname)
+    if cres == nil {
+        return "", &returnCodeError{RETURN_INVALID_PARAMETER}
+    }
+    res := C.GoString(cres)
+    C.free(unsafe.Pointer(cres))
+    return res, nil
+}
+
+// Convert IDN Unicode label to ASCII, performing Punycode encoding if
+func ULabelToALabel(s string) (string, error) {
+    cname := C.CString(s)
+    defer C.free(unsafe.Pointer(cname))
+    cres := C.getdns_convert_ulabel_to_alabel(cname)
+    if cres == nil {
+        return "", &returnCodeError{RETURN_INVALID_PARAMETER}
+    }
+    res := C.GoString(cres)
+    C.free(unsafe.Pointer(cres))
     return res, nil
 }
