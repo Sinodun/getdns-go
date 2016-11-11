@@ -1,0 +1,13 @@
+= GetDNS-Go
+Jim Hague <jim@sinodun.com>
+
+A Go wrapper for https://getdnsapi.net/[GetDNS].
+
+This library makes the GetDNS library available to Go callers.
+
+It was written during the IETF 96 Hackathon, largely as an excuse for
+a novice Go programmer to learn more Go.
+
+At present it needs review by someone more fluent in Go. It also needs more
+documentation. For examples of how to use the library, see the tests in
+`getdns_test.go`.
